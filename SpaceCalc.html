@@ -15,7 +15,7 @@
 var context = document.getElementById('canvas').getContext('2d');
 var Lat=55.7667, Long=37.6667; // Москвабад.
 var az=0, yz=0, dh=0.95, zoom=1;
-var conlines=1, gridlines=1, connames=1, starnames=0, ref=1;
+var conlines=1, gridlines=1, connames=1, starnames=0, ref=1, vmod=1;
 var star=[], clinX, clinY, clinH, knot=[];
 
 // База созвездий на эпоху J2000.
@@ -1079,6 +1079,11 @@ function canvaskeyup(event) {
       ref=~ref;
       calc();
       break;
+    case 86: // V - смена визуальных режимов
+      vmod++;
+      if (vmod > 3) vmod=1;
+      draw();
+      break;
   }
 }
 
@@ -1087,14 +1092,25 @@ function draw() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   context.font = "12px Arial";
-  context.clearRect(0, 0, canvas.width, canvas.height);
+  if (vmod>1) context.fillStyle="black";
+  else context.fillStyle="white";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  if (vmod==1) {
+    context.fillStyle="black";
+    context.strokeStyle="black";
+  }
+  if (vmod==3) {
+    context.fillStyle="red";
+    context.strokeStyle="red";
+  }
   if (gridlines==1) grid();
-  skyline();
   stars();
+  skyline();
 }
 
 // Отрисовка созвездий.
 function stars() {
+  if (vmod==2) context.fillStyle="silver";
   for (var i=0; i<star.length; i++) {
     if (star[i].id==0 && star[i].h>0 && connames!=0) {
       var x=hA_to_x(star[i].h, star[i].A+az);
@@ -1107,9 +1123,11 @@ function stars() {
       var y=hA_to_y(star[i].h, star[i].A+az);
       var r=3.2-0.4*star[i].m;
       if (star[i].h>0) {
+        if (vmod==2) context.fillStyle=star[i].color;
         context.beginPath();
         context.arc(x, y, r, 0, 6.284);
         context.fill();
+        if (vmod==2) context.fillStyle="silver";
         if (starnames==1) context.fillText(star[i].name2, x+10, y-10);
         if (starnames==2) context.fillText(star[i].name1, x+10, y-10);
       }
@@ -1195,8 +1213,11 @@ function conline(x, y, i) {
 
 // Отрисовка линии созвездия.
 function cline(x, y, i) {
+  if (vmod==2) {
+  	context.strokeStyle="aqua";
+  }
   if (clinH>0 || star[i].h>0) {
-    context.lineWidth = 0.2;
+  	context.lineWidth = 0.2;
     context.beginPath();
     context.moveTo(clinX, clinY);
     context.lineTo(x, y);
@@ -1219,6 +1240,10 @@ function calc() {
 
 // Горизонт и стороны света.
 function skyline() {
+  if (vmod==2) {
+    context.fillStyle="red";
+    context.strokeStyle="red";
+  }
   var carDir=["С", "45°", "В", "135°", "Ю", "225°", "З", "315°"];
   context.lineWidth = 1;
   context.beginPath();
@@ -1239,7 +1264,12 @@ function skyline() {
 // Азимутальная сетка.
 function grid() {
   var n=9;
-  context.lineWidth = 0.05;
+  if (vmod==2) {
+  	context.lineWidth = 0.06;
+  	context.strokeStyle="white";
+  }
+  else if (vmod==3) context.lineWidth = 0.08;
+  else context.lineWidth = 0.05;
   for (i=1; i<n; i++) {
     context.beginPath();
     context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*i/n*zoom, 0, 6.284);
@@ -1369,7 +1399,8 @@ function help() {
     "вкл/выкл азимутальную сетку - клавиша H,\n"+
     "переключить отображение названий созвездий - клавиша N,\n"+
     "переключить отображение названий звезд - клавиша M,\n"+
-    "вкл/выкл учет атмосферной рефракции - клавиша R."
+    "вкл/выкл учет атмосферной рефракции - клавиша R,\n"+
+    "сменить визуальный режим - клавиша V."
   );
 }
 
