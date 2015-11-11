@@ -15,7 +15,7 @@
 var context = document.getElementById('canvas').getContext('2d');
 var Lat=55.7667, Long=37.6667; // Москвабад.
 var az=0, yz=0, dh=0.95, zoom=1;
-var conlines=1, gridlines=1, connames=1, starnames=0, ref=1;
+var conlines=1, gridlines=1, connames=1, starnames=0, ref=1, vmod=0;
 var star=[], clinX, clinY, clinH, knot=[];
 
 // База созвездий на эпоху J2000.
@@ -1079,6 +1079,11 @@ function canvaskeyup(event) {
       ref=~ref;
       calc();
       break;
+    case 86: // V - смена визуальных режимов
+      vmod++;
+      if (vmod > 1) vmod=0;
+      draw();
+      break;
   }
 }
 
@@ -1087,7 +1092,17 @@ function draw() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   context.font = "12px Arial";
-  context.clearRect(0, 0, canvas.width, canvas.height);
+  if (vmod==0) context.fillStyle="white";
+  else context.fillStyle="black";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  if (vmod==0) {
+    context.fillStyle="black";
+    context.strokeStyle="black";
+  }
+  else {
+    context.fillStyle="red";
+    context.strokeStyle="red";
+  }
   if (gridlines==1) grid();
   skyline();
   stars();
@@ -1239,7 +1254,8 @@ function skyline() {
 // Азимутальная сетка.
 function grid() {
   var n=9;
-  context.lineWidth = 0.05;
+  if (vmod==0) context.lineWidth = 0.05;
+  else context.lineWidth = 0.08;
   for (i=1; i<n; i++) {
     context.beginPath();
     context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*i/n*zoom, 0, 6.284);
@@ -1369,7 +1385,8 @@ function help() {
     "вкл/выкл азимутальную сетку - клавиша H,\n"+
     "переключить отображение названий созвездий - клавиша N,\n"+
     "переключить отображение названий звезд - клавиша M,\n"+
-    "вкл/выкл учет атмосферной рефракции - клавиша R."
+    "вкл/выкл учет атмосферной рефракции - клавиша R,\n"+
+    "сменить визуальный режим - клавиша V."
   );
 }
 
