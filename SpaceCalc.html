@@ -949,11 +949,11 @@ var starsBase = [
 ];
 
 // Загрузка сохраненного состояния.
-if (localStorage.getItem("azimut")) az = +localStorage.getItem("azimut");
-if (localStorage.getItem("yz")) yz = +localStorage.getItem("yz");
-if (localStorage.getItem("zoom")) zoom = +localStorage.getItem("zoom");
-if (localStorage.getItem("latitude")) Lat = +localStorage.getItem("latitude");
-if (localStorage.getItem("longitude")) Long = +localStorage.getItem("longitude");
+if (localStorage.getItem("sc_azimut")) az = +localStorage.getItem("sc_azimut");
+if (localStorage.getItem("sc_yz")) yz = +localStorage.getItem("sc_yz");
+if (localStorage.getItem("sc_zoom")) zoom = +localStorage.getItem("sc_zoom");
+if (localStorage.getItem("sc_latitude")) Lat = +localStorage.getItem("sc_latitude");
+if (localStorage.getItem("sc_longitude")) Long = +localStorage.getItem("sc_longitude");
 
 // Преобразование базы звезд в удобочитаемый вид.
 for (var i=0; i<starsBase.length/8; i++ ) {
@@ -979,9 +979,9 @@ window.onbeforeunload = closeSC;
 
 // Сохранение состояния при закрытии.
 function closeSC() {
-  localStorage.setItem("azimut", az);
-  localStorage.setItem("yz", yz);
-  localStorage.setItem("zoom", zoom);
+  localStorage.setItem("sc_azimut", az);
+  localStorage.setItem("sc_yz", yz);
+  localStorage.setItem("sc_zoom", zoom);
 }
 
 // Назначение клавиш.
@@ -1032,12 +1032,12 @@ function canvaskeyup(event) {
       if (sLat != null) {
         Lat=+sLat;
         if (Math.abs(Lat)==90) Lat-=Math.sign(Lat)*0.0001;
-        localStorage.setItem("latitude", Lat);
+        localStorage.setItem("sc_latitude", Lat);
       }
       var sLong = prompt('Вводи долготу в градусах', Long);
       if (sLong != null) {
         Long=+sLong;
-        localStorage.setItem("longitude", Long);
+        localStorage.setItem("sc_longitude", Long);
       }
       calc();
       break;
@@ -1213,11 +1213,9 @@ function conline(x, y, i) {
 
 // Отрисовка линии созвездия.
 function cline(x, y, i) {
-  if (vmod==2) {
-  	context.strokeStyle="aqua";
-  }
+  if (vmod==2) context.strokeStyle="aqua";
   if (clinH>0 || star[i].h>0) {
-  	context.lineWidth = 0.2;
+    context.lineWidth = 0.2;
     context.beginPath();
     context.moveTo(clinX, clinY);
     context.lineTo(x, y);
@@ -1403,7 +1401,6 @@ function help() {
     "сменить визуальный режим - клавиша V."
   );
 }
-
 </script>
 </body>
 </html>
