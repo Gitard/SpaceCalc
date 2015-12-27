@@ -1103,9 +1103,9 @@ function draw() {
     context.fillStyle="red";
     context.strokeStyle="red";
   }
+  skyline();
   if (gridlines==1) grid();
   stars();
-  skyline();
 }
 
 // Отрисовка созвездий.
@@ -1244,9 +1244,6 @@ function skyline() {
   }
   var carDir=["С", "45°", "В", "135°", "Ю", "225°", "З", "315°"];
   context.lineWidth = 1;
-  context.beginPath();
-  context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*zoom, 0, 6.284);
-  context.stroke();
   context.textBaseline = "middle";
   context.textAlign = "center";
   for (var i=0; i<carDir.length; i++) {
@@ -1257,6 +1254,14 @@ function skyline() {
     context.stroke();
     context.fillText(carDir[i], hA_to_x(-3, A), hA_to_y(-3, A));
   }
+  context.beginPath();
+  context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*zoom, 0, 6.284);
+  if (vmod==2) {
+    context.fillStyle="#080808";
+    context.fill();
+  }
+  context.stroke();
+  context.clip()
 }
 
 // Азимутальная сетка.
@@ -1388,17 +1393,17 @@ function help() {
     "\n"+
     "Справка по управляющим клавишам.\n"+
     "\n"+
-    "Поворот неба по/против часовой стрелки - клавиши вправо/влево,\n"+
-    "обзор неба по вертикали - клавиши вверх/вниз,\n"+
-    "быстрая навигация по сторонам света - клавиши WASD,\n"+
-    "увеличение/уменьшение - клавиши Pg Up и Pg Dn,\n"+
-    "ввести свои координаты - клавиша C,\n"+
-    "вкл/выкл линии созвездий - клавиша L,\n"+
-    "вкл/выкл азимутальную сетку - клавиша H,\n"+
-    "переключить отображение названий созвездий - клавиша N,\n"+
-    "переключить отображение названий звезд - клавиша M,\n"+
-    "вкл/выкл учет атмосферной рефракции - клавиша R,\n"+
-    "сменить визуальный режим - клавиша V."
+    "Поворот неба - клавиши вправо/влево.\n"+
+    "Обзор неба по вертикали - вверх/вниз.\n"+
+    "Навигация по сторонам света - клавиши WASD.\n"+
+    "Увеличение/уменьшение - Page Up и Page Down.\n"+
+    "Ввести свои координаты - C.\n"+
+    "Скрыть линии созвездий - L.\n"+
+    "Скрыть азимутальную сетку - H.\n"+
+    "Отображение названий созвездий - N.\n"+
+    "Отображение названий звезд - M.\n"+
+    "Не учитывать атмосферную рефракцию - R.\n"+
+    "Сменить визуальный режим - V."
   );
 }
 </script>
