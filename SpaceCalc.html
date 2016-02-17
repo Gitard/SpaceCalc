@@ -984,7 +984,7 @@ function closeSC() {
   localStorage.setItem("sc_zoom", zoom);
 }
 
-// Назначение клавиш.
+// Назначение клавиш нажатия.
 function canvaskeydown(event) {
   switch (event.keyCode) {
     case 37: // ← - вращение неба против часовой
@@ -1025,6 +1025,7 @@ function canvaskeydown(event) {
   }
 }
 
+// Назначение клавиш отжатия.
 function canvaskeyup(event) {
   switch (event.keyCode) {
     case 67: // C - задать свои координаты
@@ -1213,9 +1214,10 @@ function conline(x, y, i) {
 
 // Отрисовка линии созвездия.
 function cline(x, y, i) {
-  if (vmod==2) context.strokeStyle="aqua";
   if (clinH>0 || star[i].h>0) {
-    context.lineWidth = 0.2;
+    if (vmod==2) context.strokeStyle="aqua";
+    if (vmod==3) context.lineWidth = 0.3;
+    else context.lineWidth = 0.2;
     context.beginPath();
     context.moveTo(clinX, clinY);
     context.lineTo(x, y);
@@ -1268,10 +1270,10 @@ function skyline() {
 function grid() {
   var n=9;
   if (vmod==2) {
-  	context.lineWidth = 0.06;
+  	context.lineWidth = 0.03;
   	context.strokeStyle="white";
   }
-  else if (vmod==3) context.lineWidth = 0.08;
+  else if (vmod==3) context.lineWidth = 0.1;
   else context.lineWidth = 0.05;
   for (i=1; i<n; i++) {
     context.beginPath();
@@ -1393,17 +1395,17 @@ function help() {
     "\n"+
     "Справка по управляющим клавишам.\n"+
     "\n"+
-    "Поворот неба - клавиши вправо/влево.\n"+
-    "Обзор неба по вертикали - вверх/вниз.\n"+
-    "Навигация по сторонам света - клавиши WASD.\n"+
-    "Увеличение/уменьшение - Page Up и Page Down.\n"+
-    "Ввести свои координаты - C.\n"+
-    "Скрыть линии созвездий - L.\n"+
-    "Скрыть азимутальную сетку - H.\n"+
-    "Отображение названий созвездий - N.\n"+
-    "Отображение названий звезд - M.\n"+
-    "Не учитывать атмосферную рефракцию - R.\n"+
-    "Сменить визуальный режим - V."
+    "←/→ - поворот неба по/против часовой стрелки,\n"+
+    "↑/↓ - обзор неба по вертикали,\n"+
+    "WASD - быстрая навигация по сторонам света,\n"+
+    "Pg Up/Pg Dn - увеличение/уменьшение,\n"+
+    "C - ввести свои координаты,\n"+
+    "L - вкл/выкл линии созвездий,\n"+
+    "H - вкл/выкл азимутальную сетку,\n"+
+    "N - переключить отображение названий созвездий,\n"+
+    "M - переключить отображение названий звезд,\n"+
+    "R - вкл/выкл учет атмосферной рефракции,\n"+
+    "V - сменить визуальный режим."
   );
 }
 </script>
