@@ -1,13 +1,13 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>Личинка планетария</title>
-  <meta charset="utf-8">
-  <style>
-  * { margin:0; padding:0; }
-  html, body { width:100%; height:100%; }
-  canvas { display:block; }
-  </style>
+<title>Личинка планетария</title>
+<meta charset="utf-8">
+<style>
+	* { margin:0; padding:0; }
+	html, body { width:100%; height:100%; }
+	canvas { display:block; }
+</style>
 </head>
 <body>
 <canvas id="canvas" onclick="help()">Попробуй открыть в Браузере.</canvas>
@@ -484,13 +484,13 @@ var starsBase = [
 1, "ζ", "", 163710, -103402, 2.56, "O", 2,
 1, "ε", "Иед постериор", 161819, -44133, 3.24, "G", 5,
 
-0, "Ser2", "Змея", 180700, -125200, 0, 0, 0,
+0, "Ser2", "Хвост Змеи", 180700, -125200, 0, 0, 0,
 1, "ξ", "", 173735, -152355, 3.54, "F", 2,
 1, "ν", "", 175902, -94625, 3.34, "K", 2,
 1, "η", "", 182119, -25356, 3.26, "K", 2,
 1, "θ", "", 185613, 41213, 4.62, "A", 4,
 
-0, "Ser1", "Змея", 160100, 5200, 0, 0, 0,
+0, "Ser1", "Голова Змеи", 160100, 5200, 0, 0, 0,
 1, "μ", "", 154937, -32549, 3.53, "A", 2,
 1, "ε", "", 155049, 42840, 3.71, "A", 2,
 1, "α", "Ункалхаи", 154416, 62532, 2.65, "K", 2,
@@ -957,15 +957,15 @@ if (localStorage.getItem("sc_longitude")) Long = +localStorage.getItem("sc_longi
 
 // Преобразование базы звезд в удобочитаемый вид.
 for (var i=0; i<starsBase.length/8; i++ ) {
-  star[i]={};
-  star[i].id=starsBase[i*8];
-  star[i].name1=starsBase[i*8+1];
-  star[i].name2=starsBase[i*8+2];
-  star[i].a0=hms_to_h(starsBase[i*8+3]);
-  star[i].d0=hms_to_h(starsBase[i*8+4]);
-  star[i].m=starsBase[i*8+5];
-  star[i].color=starsColor(starsBase[i*8+6]);
-  star[i].line=starsBase[i*8+7];
+	star[i]={};
+	star[i].id=starsBase[i*8];
+	star[i].name1=starsBase[i*8+1];
+	star[i].name2=starsBase[i*8+2];
+	star[i].a0=hms_to_h(starsBase[i*8+3]);
+	star[i].d0=hms_to_h(starsBase[i*8+4]);
+	star[i].m=starsBase[i*8+5];
+	star[i].color=starsColor(starsBase[i*8+6]);
+	star[i].line=starsBase[i*8+7];
 }
 
 // Ядро программы.
@@ -979,434 +979,434 @@ window.onbeforeunload = closeSC;
 
 // Сохранение состояния при закрытии.
 function closeSC() {
-  localStorage.setItem("sc_azimut", az);
-  localStorage.setItem("sc_yz", yz);
-  localStorage.setItem("sc_zoom", zoom);
+	localStorage.setItem("sc_azimut", az);
+	localStorage.setItem("sc_yz", yz);
+	localStorage.setItem("sc_zoom", zoom);
 }
 
 // Назначение клавиш нажатия.
 function canvaskeydown(event) {
-  switch (event.keyCode) {
-    case 37: // ← - вращение неба против часовой
-      if (zoom>1) az+=5/zoom;
-      else az+=5/zoom;
-      draw();
-      break;
-    case 39: // → - вращение неба по часовой
-      if (zoom>1) az-=5/zoom;
-      else az-=5/zoom;
-      draw();
-      break;
-    case 38: // ↑ - обзор неба вверх
-      yz+=0.03;
-      if (yz>zoom) yz=zoom;
-      draw();
-      break;
-    case 40: // ↓ - обзор неба вниз
-      yz-=0.03;
-      if (yz<1-zoom) yz=1-zoom;
-      draw();
-      break;
-    case 33: // Pg Up - увеличение
-      if (zoom<24) {
-        zoom*=1.1;
-        yz-=(0.5-yz)*0.1;
-      }
-      draw();
-      break;
-    case 34: // Pg Down - уменьшение
-      zoom*=0.9;
-      if (zoom<0.5) zoom=0.5;
-      else yz+=(0.5-yz)*0.1;
-      if (yz<1-zoom) yz=1-zoom;
-      if (yz>zoom) yz=zoom;
-      draw();
-      break;
-  }
+	switch (event.keyCode) {
+		case 37: // ← - вращение неба против часовой
+			if (zoom>1) az+=5/zoom;
+			else az+=5/zoom;
+			draw();
+			break;
+		case 39: // → - вращение неба по часовой
+			if (zoom>1) az-=5/zoom;
+			else az-=5/zoom;
+			draw();
+			break;
+		case 38: // ↑ - обзор неба вверх
+			yz+=0.03;
+			if (yz>zoom) yz=zoom;
+			draw();
+			break;
+		case 40: // ↓ - обзор неба вниз
+			yz-=0.03;
+			if (yz<1-zoom) yz=1-zoom;
+			draw();
+			break;
+		case 33: // Pg Up - увеличение
+			if (zoom<24) {
+				zoom*=1.1;
+				yz-=(0.5-yz)*0.1;
+			}
+			draw();
+			break;
+		case 34: // Pg Down - уменьшение
+			zoom*=0.9;
+			if (zoom<0.5) zoom=0.5;
+			else yz+=(0.5-yz)*0.1;
+			if (yz<1-zoom) yz=1-zoom;
+			if (yz>zoom) yz=zoom;
+			draw();
+			break;
+	}
 }
 
 // Назначение клавиш отжатия.
 function canvaskeyup(event) {
-  switch (event.keyCode) {
-    case 67: // C - задать свои координаты
-      var sLat = prompt('Вводи широту в градусах', Lat);
-      if (sLat != null) {
-        Lat=+sLat;
-        if (Math.abs(Lat)==90) Lat-=Math.sign(Lat)*0.0001;
-        localStorage.setItem("sc_latitude", Lat);
-      }
-      var sLong = prompt('Вводи долготу в градусах', Long);
-      if (sLong != null) {
-        Long=+sLong;
-        localStorage.setItem("sc_longitude", Long);
-      }
-      calc();
-      break;
-    case 87: // W - обзор севера
-      az=0, yz=0, zoom=1;
-      draw();
-      break;
-    case 65: // A - обзор запада
-      az=90, yz=0, zoom=1;
-      draw();
-      break;
-    case 83: // S - обзор юга
-      az=180, yz=0, zoom=1;
-      draw();
-      break;
-    case 68: // D - обзор востока
-      az=270, yz=0, zoom=1;
-      draw();
-      break;
-    case 76: // L - отображение линий созвездий
-      conlines=~conlines;
-      draw();
-      break;
-    case 78: // N - отображение названий созвездий
-      connames++;
-      if (connames > 2) connames=0;
-      draw();
-      break;
-    case 77: // M - отображение названий звезд
-      starnames++;
-      if (starnames > 2) starnames=0;
-      draw();
-      break;
-    case 72: // H - отображение азимутальной сетки
-      gridlines=~gridlines;
-      draw();
-      break;
-    case 82: // R - учет атмосферной рефракции
-      ref=~ref;
-      calc();
-      break;
-    case 86: // V - смена визуальных режимов
-      vmod++;
-      if (vmod > 3) vmod=1;
-      draw();
-      break;
-  }
+	switch (event.keyCode) {
+		case 67: // C - задать свои координаты
+			var sLat = prompt('Вводи широту в градусах', Lat);
+			if (sLat != null) {
+				Lat=+sLat;
+				if (Math.abs(Lat)==90) Lat-=Math.sign(Lat)*0.0001;
+				localStorage.setItem("sc_latitude", Lat);
+			}
+			var sLong = prompt('Вводи долготу в градусах', Long);
+			if (sLong != null) {
+				Long=+sLong;
+				localStorage.setItem("sc_longitude", Long);
+			}
+			calc();
+			break;
+		case 87: // W - обзор севера
+			az=0, yz=0, zoom=1;
+			draw();
+			break;
+		case 65: // A - обзор запада
+			az=90, yz=0, zoom=1;
+			draw();
+			break;
+		case 83: // S - обзор юга
+			az=180, yz=0, zoom=1;
+			draw();
+			break;
+		case 68: // D - обзор востока
+			az=270, yz=0, zoom=1;
+			draw();
+			break;
+		case 76: // L - отображение линий созвездий
+			conlines=~conlines;
+			draw();
+			break;
+		case 78: // N - отображение названий созвездий
+			connames++;
+			if (connames > 2) connames=0;
+			draw();
+			break;
+		case 77: // M - отображение названий звезд
+			starnames++;
+			if (starnames > 2) starnames=0;
+			draw();
+			break;
+		case 72: // H - отображение азимутальной сетки
+			gridlines=~gridlines;
+			draw();
+			break;
+		case 82: // R - учет атмосферной рефракции
+			ref=~ref;
+			calc();
+			break;
+		case 86: // V - смена визуальных режимов
+			vmod++;
+			if (vmod > 3) vmod=1;
+			draw();
+			break;
+	}
 }
 
 // Основная функция отрисовки.
 function draw() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  context.font = "12px Arial";
-  if (vmod>1) context.fillStyle="black";
-  else context.fillStyle="white";
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  if (vmod==1) {
-    context.fillStyle="black";
-    context.strokeStyle="black";
-  }
-  if (vmod==3) {
-    context.fillStyle="red";
-    context.strokeStyle="red";
-  }
-  skyline();
-  if (gridlines==1) grid();
-  stars();
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	context.font = "12px Arial";
+	if (vmod>1) context.fillStyle="black";
+	else context.fillStyle="white";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	if (vmod==1) {
+		context.fillStyle="black";
+		context.strokeStyle="black";
+	}
+	if (vmod==3) {
+		context.fillStyle="red";
+		context.strokeStyle="red";
+	}
+	skyline();
+	if (gridlines==1) grid();
+	stars();
 }
 
 // Отрисовка созвездий.
 function stars() {
-  if (vmod==2) context.fillStyle="silver";
-  for (var i=0; i<star.length; i++) {
-    if (star[i].id==0 && star[i].h>0 && connames!=0) {
-      var x=hA_to_x(star[i].h, star[i].A+az);
-      var y=hA_to_y(star[i].h, star[i].A+az); 
-      if (connames==1) context.fillText(star[i].name2, x, y);
-      else context.fillText(star[i].name1, x, y);
-    }
-    if (star[i].id==1) {
-      var x=hA_to_x(star[i].h, star[i].A+az);
-      var y=hA_to_y(star[i].h, star[i].A+az);
-      var r=3.2-0.4*star[i].m;
-      if (star[i].h>0) {
-        if (vmod==2) context.fillStyle=star[i].color;
-        context.beginPath();
-        context.arc(x, y, r, 0, 6.284);
-        context.fill();
-        if (vmod==2) context.fillStyle="silver";
-        if (starnames==1) context.fillText(star[i].name2, x+10, y-10);
-        if (starnames==2) context.fillText(star[i].name1, x+10, y-10);
-      }
-      if (conlines==1) conline(x, y, i);
-      clinH=star[i].h;
-    }
-  }
+	if (vmod==2) context.fillStyle="silver";
+	for (var i=0; i<star.length; i++) {
+		if (star[i].id==0 && star[i].h>0 && connames!=0) {
+			var x=hA_to_x(star[i].h, star[i].A+az);
+			var y=hA_to_y(star[i].h, star[i].A+az); 
+			if (connames==1) context.fillText(star[i].name2, x, y);
+			else context.fillText(star[i].name1, x, y);
+		}
+		if (star[i].id==1) {
+			var x=hA_to_x(star[i].h, star[i].A+az);
+			var y=hA_to_y(star[i].h, star[i].A+az);
+			var r=3.2-0.4*star[i].m;
+			if (star[i].h>0) {
+				if (vmod==2) context.fillStyle=star[i].color;
+				context.beginPath();
+				context.arc(x, y, r, 0, 6.284);
+				context.fill();
+				if (vmod==2) context.fillStyle="silver";
+				if (starnames==1) context.fillText(star[i].name2, x+10, y-10);
+				if (starnames==2) context.fillText(star[i].name1, x+10, y-10);
+			}
+			if (conlines==1) conline(x, y, i);
+			clinH=star[i].h;
+		}
+	}
 }
 
 // Построение линий созвездий.
 function conline(x, y, i) {
-  switch (star[i].line) {
-    case 1: // начало
-      clinX=x;
-      clinY=y;
-      knot.length=0;
-      knot[0]={};
-      knot[0].x=x;
-      knot[0].y=y;
-      break;
-    case 2: // линия
-      cline(x, y, i);
-      break;
-    case 3: // узел
-      cline(x, y, i);
-      knot[knot.length]={};
-      knot[knot.length-1].x=x;
-      knot[knot.length-1].y=y;
-      break;
-    case 4:// конец и закрыть узел
-      cline(x, y, i);
-      knot.length-=1;
-      clinX=knot[knot.length-1].x;
-      clinY=knot[knot.length-1].y;
-      break;
-    case 5: // связать с прошлым
-      cline(x, y, i);
-      var x=knot[knot.length-2].x;
-      var y=knot[knot.length-2].y;
-      cline(x, y, i);
-      clinX=knot[knot.length-1].x;
-      clinY=knot[knot.length-1].y;
-      break;
-    case 6: // узел с заменой
-      cline(x, y, i);
-      knot[knot.length-1]={};
-      knot[knot.length-1].x=x;
-      knot[knot.length-1].y=y;
-      break;
-    case 7: // конец
-      cline(x, y, i);
-      clinX=knot[knot.length-1].x;
-      clinY=knot[knot.length-1].y;
-      break;
-    case 8: // связать и закрыть узел
-      cline(x, y, i);
-      var x=knot[knot.length-1].x;
-      var y=knot[knot.length-1].y;
-      cline(x, y, i);
-      knot.length-=1;
-      clinX=knot[knot.length-1].x;
-      clinY=knot[knot.length-1].y;
-      break;
-    case 9: // связать
-      cline(x, y, i);
-      var x=knot[knot.length-1].x;
-      var y=knot[knot.length-1].y;
-      cline(x, y, i);
-      break;
-    case 10: // связать с прошлым и узел
-      cline(x, y, i);
-      knot[knot.length]={};
-      knot[knot.length-1].x=x;
-      knot[knot.length-1].y=y;
-      var x=knot[knot.length-3].x;
-      var y=knot[knot.length-3].y;
-      cline(x, y, i);
-      clinX=knot[knot.length-1].x;
-      clinY=knot[knot.length-1].y;
-      break;
-  }
+	switch (star[i].line) {
+		case 1: // начало
+			clinX=x;
+			clinY=y;
+			knot.length=0;
+			knot[0]={};
+			knot[0].x=x;
+			knot[0].y=y;
+			break;
+		case 2: // линия
+			cline(x, y, i);
+			break;
+		case 3: // узел
+			cline(x, y, i);
+			knot[knot.length]={};
+			knot[knot.length-1].x=x;
+			knot[knot.length-1].y=y;
+			break;
+		case 4:// конец и закрыть узел
+			cline(x, y, i);
+			knot.length-=1;
+			clinX=knot[knot.length-1].x;
+			clinY=knot[knot.length-1].y;
+			break;
+		case 5: // связать с прошлым
+			cline(x, y, i);
+			var x=knot[knot.length-2].x;
+			var y=knot[knot.length-2].y;
+			cline(x, y, i);
+			clinX=knot[knot.length-1].x;
+			clinY=knot[knot.length-1].y;
+			break;
+		case 6: // узел с заменой
+			cline(x, y, i);
+			knot[knot.length-1]={};
+			knot[knot.length-1].x=x;
+			knot[knot.length-1].y=y;
+			break;
+		case 7: // конец
+			cline(x, y, i);
+			clinX=knot[knot.length-1].x;
+			clinY=knot[knot.length-1].y;
+			break;
+		case 8: // связать и закрыть узел
+			cline(x, y, i);
+			var x=knot[knot.length-1].x;
+			var y=knot[knot.length-1].y;
+			cline(x, y, i);
+			knot.length-=1;
+			clinX=knot[knot.length-1].x;
+			clinY=knot[knot.length-1].y;
+			break;
+		case 9: // связать
+			cline(x, y, i);
+			var x=knot[knot.length-1].x;
+			var y=knot[knot.length-1].y;
+			cline(x, y, i);
+			break;
+		case 10: // связать с прошлым и узел
+			cline(x, y, i);
+			knot[knot.length]={};
+			knot[knot.length-1].x=x;
+			knot[knot.length-1].y=y;
+			var x=knot[knot.length-3].x;
+			var y=knot[knot.length-3].y;
+			cline(x, y, i);
+			clinX=knot[knot.length-1].x;
+			clinY=knot[knot.length-1].y;
+			break;
+	}
 }
 
 // Отрисовка линии созвездия.
 function cline(x, y, i) {
-  if (clinH>0 || star[i].h>0) {
-    if (vmod==2) context.strokeStyle="aqua";
-    if (vmod==3) context.lineWidth = 0.3;
-    else context.lineWidth = 0.2;
-    context.beginPath();
-    context.moveTo(clinX, clinY);
-    context.lineTo(x, y);
-    context.stroke();
-  }
-  clinX=x;
-  clinY=y;
+	if (clinH>0 || star[i].h>0) {
+		if (vmod==2) context.strokeStyle="aqua";
+		if (vmod==3) context.lineWidth = 0.3;
+		else context.lineWidth = 0.2;
+		context.beginPath();
+		context.moveTo(clinX, clinY);
+		context.lineTo(x, y);
+		context.stroke();
+	}
+	clinX=x;
+	clinY=y;
 }
 
 // Расчет положения светил.
 function calc() {
-  var lstime=LST(JD());
-  for (var i=0; i<star.length; i++) {
-    star[i].h=ad_to_h(star[i].a, star[i].d, lstime);
-    star[i].A=ad_to_A(star[i].a, star[i].d, lstime, star[i].h);
-    if (star[i].h>-1 && ref==1) star[i].h+=refr(star[i].h);
-  }
-  draw();
+	var lstime=LST(JD());
+	for (var i=0; i<star.length; i++) {
+		star[i].h=ad_to_h(star[i].a, star[i].d, lstime);
+		star[i].A=ad_to_A(star[i].a, star[i].d, lstime, star[i].h);
+		if (star[i].h>-1 && ref==1) star[i].h+=refr(star[i].h);
+	}
+	draw();
 }
 
 // Горизонт и стороны света.
 function skyline() {
-  if (vmod==2) {
-    context.fillStyle="red";
-    context.strokeStyle="red";
-  }
-  var carDir=["С", "45°", "В", "135°", "Ю", "225°", "З", "315°"];
-  context.lineWidth = 1;
-  context.textBaseline = "middle";
-  context.textAlign = "center";
-  for (var i=0; i<carDir.length; i++) {
-    var A=az+i*45;
-    context.beginPath();
-    context.moveTo(hA_to_x(0, A), hA_to_y(0, A));
-    context.lineTo(hA_to_x(-0.7, A), hA_to_y(-0.7, A));
-    context.stroke();
-    context.fillText(carDir[i], hA_to_x(-3, A), hA_to_y(-3, A));
-  }
-  context.beginPath();
-  context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*zoom, 0, 6.284);
-  if (vmod==2) {
-    context.fillStyle="#080808";
-    context.fill();
-  }
-  context.stroke();
-  context.clip()
+	if (vmod==2) {
+		context.fillStyle="red";
+		context.strokeStyle="red";
+	}
+	var carDir=["С", "45°", "В", "135°", "Ю", "225°", "З", "315°"];
+	context.lineWidth = 1;
+	context.textBaseline = "middle";
+	context.textAlign = "center";
+	for (var i=0; i<carDir.length; i++) {
+		var A=az+i*45;
+		context.beginPath();
+		context.moveTo(hA_to_x(0, A), hA_to_y(0, A));
+		context.lineTo(hA_to_x(-0.7, A), hA_to_y(-0.7, A));
+		context.stroke();
+		context.fillText(carDir[i], hA_to_x(-3, A), hA_to_y(-3, A));
+	}
+	context.beginPath();
+	context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*zoom, 0, 6.284);
+	if (vmod==2) {
+		context.fillStyle="#080808";
+		context.fill();
+	}
+	context.stroke();
+	context.clip()
 }
 
 // Азимутальная сетка.
 function grid() {
-  var n=9;
-  if (vmod==2) {
-  	context.lineWidth = 0.03;
-  	context.strokeStyle="white";
-  }
-  else if (vmod==3) context.lineWidth = 0.1;
-  else context.lineWidth = 0.05;
-  for (i=1; i<n; i++) {
-    context.beginPath();
-    context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*i/n*zoom, 0, 6.284);
-    context.stroke();
-  }
-  for (i=-n; i<n; i++) {
-    context.beginPath();
-    context.moveTo(hA_to_x(0, az+i*90/n), hA_to_y(0, az+i*90/n));
-    context.lineTo(hA_to_x(0, az+i*90/n+180), hA_to_y(0, az+i*90/n+180));
-    context.stroke();
-  }
+	var n=9;
+	if (vmod==2) {
+		context.lineWidth = 0.03;
+		context.strokeStyle="white";
+	}
+	else if (vmod==3) context.lineWidth = 0.1;
+	else context.lineWidth = 0.05;
+	for (i=1; i<n; i++) {
+		context.beginPath();
+		context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*i/n*zoom, 0, 6.284);
+		context.stroke();
+	}
+	for (i=-n; i<n; i++) {
+		context.beginPath();
+		context.moveTo(hA_to_x(0, az+i*90/n), hA_to_y(0, az+i*90/n));
+		context.lineTo(hA_to_x(0, az+i*90/n+180), hA_to_y(0, az+i*90/n+180));
+		context.stroke();
+	}
 }
 
 // Учет прецессии
 function precession(jd) {
-  var N = (jd-2451543.5)/365.25/3600;
-  var k = Math.PI/180;
-  for (var i=0; i<star.length; i++ ) {
-    star[i].a = star[i].a0 + (3.0742+1.33589*Math.sin(15*k*star[i].a0)*Math.tan(k*star[i].d0))*N;
-    star[i].d = star[i].d0 + 20.0383*Math.cos(15*k*star[i].a0)*N;
-  }
+	var N = (jd-2451543.5)/365.25/3600;
+	var k = Math.PI/180;
+	for (var i=0; i<star.length; i++ ) {
+		star[i].a = star[i].a0 + (3.0742+1.33589*Math.sin(15*k*star[i].a0)*Math.tan(k*star[i].d0))*N;
+		star[i].d = star[i].d0 + 20.0383*Math.cos(15*k*star[i].a0)*N;
+	}
 }
 
 // Юлианский день
 function JD() {
-  return 2440587.5+Date.now()/864e5;
+	return 2440587.5+Date.now()/864e5;
 }
 
 // Количество дней с начала года.
 function numDay() {
-  var today = new Date();
-  var start = Date.UTC(today.getFullYear(), 0, 0);
-  return (today.getTime()-start)/864e5;
+	var today = new Date();
+	var start = Date.UTC(today.getFullYear(), 0, 0);
+	return (today.getTime()-start)/864e5;
 }
 
 // Постоянная нутации.
 function nutB() {
-  var today = new Date();
-  var msUTC=Date.UTC(today.getFullYear(), 0, 0);
-  var jd=2440587.5+msUTC/864e5;
-  var T=(jd-2415020)/36525;
-  var R=6.6460656+2400.051262*T+0.00002581*T*T;
-  return 24*(today.getFullYear()-1899)-R;
+	var today = new Date();
+	var msUTC=Date.UTC(today.getFullYear(), 0, 0);
+	var jd=2440587.5+msUTC/864e5;
+	var T=(jd-2415020)/36525;
+	var R=6.6460656+2400.051262*T+0.00002581*T*T;
+	return 24*(today.getFullYear()-1899)-R;
 }
 
 // Наклон эклиптики к экватору, в градусах.
 function ec(jd) {
-  var T=(jd-2415020)/36525;
-  var de=46.845*T+0.0059*T*T-0.001811*T*T*T;
-  return 23.452294-de/3600;
+	var T=(jd-2415020)/36525;
+	var de=46.845*T+0.0059*T*T-0.001811*T*T*T;
+	return 23.452294-de/3600;
 }
 
 // Учет атмосферной рефракции.
 function refr(h) {
-  return 1.02/Math.tan((h+10.3/(h+5.11))*Math.PI/180)/60;
+	return 1.02/Math.tan((h+10.3/(h+5.11))*Math.PI/180)/60;
 }
 
 // Среднее время по Гринвичу, в часах.
 function GMT(jd) {
-  return 24*(jd-0.5-Math.floor(jd-0.5));
+	return 24*(jd-0.5-Math.floor(jd-0.5));
 }
 
 // Местное звездное время, в часах.
 function LST(jd) {
-  var lst=Math.floor(numDay())*0.0657098-nutB()+GMT(jd)*1.002738+Long/15;
-  return lst-24*((lst/24)|0);
+	var lst=Math.floor(numDay())*0.0657098-nutB()+GMT(jd)*1.002738+Long/15;
+	return lst-24*((lst/24)|0);
 }
 
 // Преобразование минут и секунд в десятичный формат.
 function hms_to_h(hms) {
-  var h=(hms/10000)|0;
-  var m=(+(hms/10000-h).toFixed(10)*100)|0;
-  var s=(hms/100-((hms/100)|0))*100;
-  return h+m/60+s/3600;
+	var h=(hms/10000)|0;
+	var m=(+(hms/10000-h).toFixed(10)*100)|0;
+	var s=(hms/100-((hms/100)|0))*100;
+	return h+m/60+s/3600;
 }
 
 // Функции перевода азимутальной проекции на холст.
 function hA_to_x(h, A) {
-  return canvas.width/2+(canvas.height*dh*zoom*(1-h/90))*Math.sin(A*Math.PI/180);
+	return canvas.width/2+(canvas.height*dh*zoom*(1-h/90))*Math.sin(A*Math.PI/180);
 }
 
 function hA_to_y(h, A) {
-  return (canvas.height*dh*zoom*(1-h/90))*Math.cos(A*Math.PI/180)+yz*canvas.height;
+	return (canvas.height*dh*zoom*(1-h/90))*Math.cos(A*Math.PI/180)+yz*canvas.height;
 }
 
 // Функции перехода от экваториальных координат к горизонтальным.
 function ad_to_h(a, d, lst) {
-  var k=Math.PI/180;
-  var sinh=Math.sin(d*k)*Math.sin(Lat*k)+Math.cos(d*k)*Math.cos(Lat*k)*Math.cos(15*k*(lst-a));
-  return Math.asin(sinh)/k;
+	var k=Math.PI/180;
+	var sinh=Math.sin(d*k)*Math.sin(Lat*k)+Math.cos(d*k)*Math.cos(Lat*k)*Math.cos(15*k*(lst-a));
+	return Math.asin(sinh)/k;
 }
 
 function ad_to_A(a, d, lst, h) {
-  var k=Math.PI/180;
-  var cosA=(Math.sin(d*k)-Math.sin(h*k)*Math.sin(Lat*k))/Math.cos(h*k)/Math.cos(Lat*k);
-  var A=Math.acos(cosA)/k;
-  if (Math.sin(15*k*(lst-a))<0) return A;
-  else return 360-A;
+	var k=Math.PI/180;
+	var cosA=(Math.sin(d*k)-Math.sin(h*k)*Math.sin(Lat*k))/Math.cos(h*k)/Math.cos(Lat*k);
+	var A=Math.acos(cosA)/k;
+	if (Math.sin(15*k*(lst-a))<0) return A;
+	else return 360-A;
 }
 
 // Цвет звезд.
 function starsColor(color) {
-  switch (color) {
-    case "O": return "#9aafff";
-    case "B": return "#cad7ff";
-    case "A": return "#f8f7ff";
-    case "F": return "#fff4ea";
-    case "G": return "#fff2a1";
-    case "K": return "#ffc46f";
-    case "M": return "#ff6060";
-  }
+	switch (color) {
+		case "O": return "#9aafff";
+		case "B": return "#cad7ff";
+		case "A": return "#f8f7ff";
+		case "F": return "#fff4ea";
+		case "G": return "#fff2a1";
+		case "K": return "#ffc46f";
+		case "M": return "#ff6060";
+	}
 }
 
 // Справка.
 function help() {
-  alert (
-    "Мышоинтерфейса пока нет, но уже можно позалипать в клавиатуру.\n"+
-    "\n"+
-    "Справка по управляющим клавишам.\n"+
-    "\n"+
-    "←/→ - поворот неба по/против часовой стрелки,\n"+
-    "↑/↓ - обзор неба по вертикали,\n"+
-    "WASD - быстрая навигация по сторонам света,\n"+
-    "Pg Up/Pg Dn - увеличение/уменьшение,\n"+
-    "C - ввести свои координаты,\n"+
-    "L - вкл/выкл линии созвездий,\n"+
-    "H - вкл/выкл азимутальную сетку,\n"+
-    "N - переключить отображение названий созвездий,\n"+
-    "M - переключить отображение названий звезд,\n"+
-    "R - вкл/выкл учет атмосферной рефракции,\n"+
-    "V - сменить визуальный режим."
-  );
+	alert (
+		"Мышоинтерфейса пока нет, но уже можно позалипать в клавиатуру.\n"+
+		"\n"+
+		"Справка по управляющим клавишам.\n"+
+		"\n"+
+		"←/→ - поворот неба по/против часовой стрелки,\n"+
+		"↑/↓ - обзор неба по вертикали,\n"+
+		"WASD - быстрая навигация по сторонам света,\n"+
+		"Pg Up/Pg Dn - увеличение/уменьшение,\n"+
+		"C - ввести свои координаты,\n"+
+		"L - вкл/выкл линии созвездий,\n"+
+		"H - вкл/выкл азимутальную сетку,\n"+
+		"N - переключить отображение названий созвездий,\n"+
+		"M - переключить отображение названий звезд,\n"+
+		"R - вкл/выкл учет атмосферной рефракции,\n"+
+		"V - сменить визуальный режим."
+	);
 }
 </script>
 </body>
