@@ -14,8 +14,8 @@
 <script>
 var context = document.getElementById('canvas').getContext('2d');
 var Lat=55.7667, Long=37.6667; // Москвабад.
-var az=0, yz=0, dh=0.95, zoom=1;
-var conlines=1, gridlines=1, connames=1, starnames=0, ref=1, vmod=1;
+var az=180, yz=0, dh=0.95, zoom=1;
+var conlines=1, gridlines=1, connames=1, starnames=0, ref=1, vmod=2;
 var star=[], clinX, clinY, clinH, knot=[];
 
 // База созвездий на эпоху J2000.
@@ -954,6 +954,7 @@ if (localStorage.getItem("sc_yz")) yz = +localStorage.getItem("sc_yz");
 if (localStorage.getItem("sc_zoom")) zoom = +localStorage.getItem("sc_zoom");
 if (localStorage.getItem("sc_latitude")) Lat = +localStorage.getItem("sc_latitude");
 if (localStorage.getItem("sc_longitude")) Long = +localStorage.getItem("sc_longitude");
+if (localStorage.getItem("sc_vmod")) vmod = +localStorage.getItem("sc_vmod");
 
 // Преобразование базы звезд в удобочитаемый вид.
 for (var i=0; i<starsBase.length/8; i++ ) {
@@ -982,6 +983,7 @@ function closeSC() {
 	localStorage.setItem("sc_azimut", az);
 	localStorage.setItem("sc_yz", yz);
 	localStorage.setItem("sc_zoom", zoom);
+	localStorage.setItem("sc_vmod", vmod);
 }
 
 // Назначение клавиш нажатия.
@@ -1244,12 +1246,12 @@ function skyline() {
 		context.fillStyle="red";
 		context.strokeStyle="red";
 	}
-	var carDir=["С", "45°", "В", "135°", "Ю", "225°", "З", "315°"];
+	var carDir=["С", "30°", "60°", "В", "120°", "150°", "Ю", "210°", "240°", "З", "300°", "330°"];
 	context.lineWidth = 1;
 	context.textBaseline = "middle";
 	context.textAlign = "center";
 	for (var i=0; i<carDir.length; i++) {
-		var A=az+i*45;
+		var A=az+i*30;
 		context.beginPath();
 		context.moveTo(hA_to_x(0, A), hA_to_y(0, A));
 		context.lineTo(hA_to_x(-0.7, A), hA_to_y(-0.7, A));
