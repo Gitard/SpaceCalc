@@ -10,11 +10,11 @@
 </style>
 </head>
 <body>
-<canvas id="canvas" onclick="help()">Попробуй открыть в Браузере.</canvas>
+<canvas id="canvas">Попробуй открыть в Браузере.</canvas>
 <script>
 var context = document.getElementById('canvas').getContext('2d');
 var Lat=55.7667, Long=37.6667; // Москвабад.
-var az=180, yz=0, dh=0.95, zoom=1;
+var az=180, yz=0, dh=0.95, zoom=1, jd=JD();
 var conlines=1, gridlines=1, connames=1, starnames=0, ref=1, vmod=2;
 var star=[], clinX, clinY, clinH, knot=[];
 
@@ -83,7 +83,7 @@ var starsBase = [
 1, "ν", "", 4949, 410444, 4.53, "B", 7,
 1, "γ1", "Альмаак", 20354, 421947, 2.26, "K", 2,
 1, "51", "", 13800, 483742, 3.57, "K", 4,
-1, "γ", "", 233734, 462729, 3.82, "G", 0,
+1, "λ", "", 233734, 462729, 3.82, "G", 0,
 1, "ο", "", 230155, 421934, 3.62, "B", 0,
 
 0, "Peg", "Пегас", 224130, 162820, 0, 0, 0,
@@ -970,16 +970,27 @@ for (var i=0; i<starsBase.length/8; i++ ) {
 }
 
 // Ядро программы.
-precession(JD());
+precession();
 calc();
 setInterval(calc, 30000);
-window.onkeydown = canvaskeydown;
-window.onkeyup = canvaskeyup;
 window.onresize = draw;
-window.onbeforeunload = closeSC;
+canvas.ondblclick = help;
+
+// Определение местоположения из браузера.
+if (!localStorage.getItem("sc_latitude") || !localStorage.getItem("sc_longitude")) {
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(function(position) {
+			Lat = position.coords.latitude;
+			Long = position.coords.longitude;
+			localStorage.setItem("sc_latitude", Lat);
+			localStorage.setItem("sc_longitude", Long);
+			calc();
+		});
+	}
+}
 
 // Сохранение состояния при закрытии.
-function closeSC() {
+window.onbeforeunload = function() {
 	localStorage.setItem("sc_azimut", az);
 	localStorage.setItem("sc_yz", yz);
 	localStorage.setItem("sc_zoom", zoom);
@@ -987,7 +998,7 @@ function closeSC() {
 }
 
 // Назначение клавиш нажатия.
-function canvaskeydown(event) {
+window.onkeydown = function(event) {
 	switch (event.keyCode) {
 		case 37: // ← - вращение неба против часовой
 			if (zoom>1) az+=5/zoom;
@@ -1028,8 +1039,19 @@ function canvaskeydown(event) {
 }
 
 // Назначение клавиш отжатия.
-function canvaskeyup(event) {
+window.onkeyup = function(event) {
 	switch (event.keyCode) {
+		case 88: // X - получить координаты из браузера
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(function(position) {
+					Lat = position.coords.latitude;
+					Long = position.coords.longitude;
+					localStorage.setItem("sc_latitude", Lat);
+					localStorage.setItem("sc_longitude", Long);
+					calc();
+				});
+			}
+			break;
 		case 67: // C - задать свои координаты
 			var sLat = prompt('Вводи широту в градусах', Lat);
 			if (sLat != null) {
@@ -1231,7 +1253,8 @@ function cline(x, y, i) {
 
 // Расчет положения светил.
 function calc() {
-	var lstime=LST(JD());
+	jd=JD();
+	var lstime=LST();
 	for (var i=0; i<star.length; i++) {
 		star[i].h=ad_to_h(star[i].a, star[i].d, lstime);
 		star[i].A=ad_to_A(star[i].a, star[i].d, lstime, star[i].h);
@@ -1265,7 +1288,7 @@ function skyline() {
 		context.fill();
 	}
 	context.stroke();
-	context.clip()
+	context.clip();
 }
 
 // Азимутальная сетка.
@@ -1291,7 +1314,7 @@ function grid() {
 }
 
 // Учет прецессии
-function precession(jd) {
+function precession() {
 	var N = (jd-2451543.5)/365.25/3600;
 	var k = Math.PI/180;
 	for (var i=0; i<star.length; i++ ) {
@@ -1307,23 +1330,25 @@ function JD() {
 
 // Количество дней с начала года.
 function numDay() {
-	var today = new Date();
+	var ms = (jd-2440587.5)*864e5;
+	var today = new Date(ms);
 	var start = Date.UTC(today.getFullYear(), 0, 0);
 	return (today.getTime()-start)/864e5;
 }
 
 // Постоянная нутации.
 function nutB() {
-	var today = new Date();
+	var ms = (jd-2440587.5)*864e5;
+	var today = new Date(ms);
 	var msUTC=Date.UTC(today.getFullYear(), 0, 0);
-	var jd=2440587.5+msUTC/864e5;
-	var T=(jd-2415020)/36525;
+	var jdUTC=2440587.5+msUTC/864e5;
+	var T=(jdUTC-2415020)/36525;
 	var R=6.6460656+2400.051262*T+0.00002581*T*T;
 	return 24*(today.getFullYear()-1899)-R;
 }
 
 // Наклон эклиптики к экватору, в градусах.
-function ec(jd) {
+function ec() {
 	var T=(jd-2415020)/36525;
 	var de=46.845*T+0.0059*T*T-0.001811*T*T*T;
 	return 23.452294-de/3600;
@@ -1335,13 +1360,13 @@ function refr(h) {
 }
 
 // Среднее время по Гринвичу, в часах.
-function GMT(jd) {
+function GMT() {
 	return 24*(jd-0.5-Math.floor(jd-0.5));
 }
 
 // Местное звездное время, в часах.
-function LST(jd) {
-	var lst=Math.floor(numDay())*0.0657098-nutB()+GMT(jd)*1.002738+Long/15;
+function LST() {
+	var lst=Math.floor(numDay())*0.0657098-nutB()+GMT()*1.002738+Long/15;
 	return lst-24*((lst/24)|0);
 }
 
@@ -1377,6 +1402,11 @@ function ad_to_A(a, d, lst, h) {
 	else return 360-A;
 }
 
+// Функции перехода от эклиптических координатат к экваториальным.
+function lb_to_a(l, b) {
+	
+}
+
 // Цвет звезд.
 function starsColor(color) {
 	switch (color) {
@@ -1402,6 +1432,7 @@ function help() {
 		"WASD - быстрая навигация по сторонам света,\n"+
 		"Pg Up/Pg Dn - увеличение/уменьшение,\n"+
 		"C - ввести свои координаты,\n"+
+		"X - получить координаты из браузера,\n"+
 		"L - вкл/выкл линии созвездий,\n"+
 		"H - вкл/выкл азимутальную сетку,\n"+
 		"N - переключить отображение названий созвездий,\n"+
@@ -1410,6 +1441,7 @@ function help() {
 		"V - сменить визуальный режим."
 	);
 }
+
 </script>
 </body>
 </html>
