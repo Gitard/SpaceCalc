@@ -4,9 +4,27 @@
 <title>Личинка планетария</title>
 <meta charset="utf-8">
 <style>
-	* { margin:0; padding:0; }
-	html, body { width:100%; height:100%; }
-	canvas { display:block; }
+* {
+	margin: 0;
+	padding: 0;
+}
+html, body {
+	width:100%;
+	height:100%;
+	overflow: hidden;
+}
+.modalwin {
+	width: 400px;
+	height: 400px;
+	top: 10%;
+	right: 0;
+	left: 0;
+	margin: 0 auto;
+	z-index: 2;
+	display: none;
+	position: fixed;
+	padding: 15px;
+}
 </style>
 </head>
 <body>
@@ -974,7 +992,6 @@ precession();
 calc();
 setInterval(calc, 30000);
 window.onresize = draw;
-canvas.ondblclick = help;
 
 // Определение местоположения из браузера.
 if (!localStorage.getItem("sc_latitude") || !localStorage.getItem("sc_longitude")) {
@@ -987,6 +1004,32 @@ if (!localStorage.getItem("sc_latitude") || !localStorage.getItem("sc_longitude"
 			calc();
 		});
 	}
+}
+
+// Вызов справки.
+canvas.ondblclick = function() {
+	var modalWin = document.getElementById('helpWin');
+	if (vmod == 1) {
+		modalWin.style.color = 'black';
+		modalWin.style.background = 'white';
+		modalWin.style.border = '1px solid';
+	}
+	else if (vmod == 2) {
+		modalWin.style.color = 'silver';
+		modalWin.style.background = '#080808';
+		modalWin.style.border = '1px solid red';
+	}
+	else {
+		modalWin.style.color = 'red';
+		modalWin.style.background = 'black';
+		modalWin.style.border = '1px solid';
+	}
+	modalWin.style.display = 'block';
+
+	canvas.onclick = function() {
+		modalWin.style.display = 'none';
+		canvas.onclick = null;
+	};
 }
 
 // Сохранение состояния при закрытии.
@@ -1108,6 +1151,22 @@ window.onkeyup = function(event) {
 			vmod++;
 			if (vmod > 3) vmod=1;
 			draw();
+			var modalWin = document.getElementById('helpWin');
+			if (vmod == 1) {
+				modalWin.style.color = 'black';
+				modalWin.style.background = 'white';
+				modalWin.style.border = '1px solid';
+			}
+			else if (vmod == 2) {
+				modalWin.style.color = 'silver';
+				modalWin.style.background = '#080808';
+				modalWin.style.border = '1px solid red';
+			}
+			else {
+				modalWin.style.color = 'red';
+				modalWin.style.background = 'black';
+				modalWin.style.border = '1px solid';
+			}
 			break;
 	}
 }
@@ -1182,7 +1241,7 @@ function conline(x, y, i) {
 			knot[knot.length-1].x=x;
 			knot[knot.length-1].y=y;
 			break;
-		case 4:// конец и закрыть узел
+		case 4: // конец и закрыть узел
 			cline(x, y, i);
 			knot.length-=1;
 			clinX=knot[knot.length-1].x;
@@ -1420,28 +1479,24 @@ function starsColor(color) {
 	}
 }
 
-// Справка.
-function help() {
-	alert (
-		"Мышоинтерфейса пока нет, но уже можно позалипать в клавиатуру.\n"+
-		"\n"+
-		"Справка по управляющим клавишам.\n"+
-		"\n"+
-		"←/→ - поворот неба по/против часовой стрелки,\n"+
-		"↑/↓ - обзор неба по вертикали,\n"+
-		"WASD - быстрая навигация по сторонам света,\n"+
-		"Pg Up/Pg Dn - увеличение/уменьшение,\n"+
-		"C - ввести свои координаты,\n"+
-		"X - получить координаты из браузера,\n"+
-		"L - вкл/выкл линии созвездий,\n"+
-		"H - вкл/выкл азимутальную сетку,\n"+
-		"N - переключить отображение названий созвездий,\n"+
-		"M - переключить отображение названий звезд,\n"+
-		"R - вкл/выкл учет атмосферной рефракции,\n"+
-		"V - сменить визуальный режим."
-	);
-}
-
 </script>
+
+<!-- Окно справки -->
+<div id="helpWin" class="modalwin">
+	<h2> Справка по управляющим клавишам. </h2><br>
+	←/→ - поворот неба по/против часовой стрелки, <br>
+	↑/↓ - обзор неба по вертикали, <br>
+	WASD - быстрая навигация по сторонам света, <br>
+	Pg Up/Pg Dn - увеличение/уменьшение, <br>
+	C - ввести свои координаты, <br>
+	X - получить координаты из браузера, <br>
+	L - вкл/выкл линии созвездий, <br>
+	H - вкл/выкл азимутальную сетку, <br>
+	N - переключить отображение названий созвездий, <br>
+	M - переключить отображение названий звезд, <br>
+	R - вкл/выкл учет атмосферной рефракции, <br>
+	V - сменить визуальный режим.
+</div>
+
 </body>
 </html>
