@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-<title>Личинка планетария</title>
+<title>SpaceCalc</title>
 <meta charset="utf-8">
 <style>
 * {
@@ -34,7 +34,7 @@ var context = document.getElementById('canvas').getContext('2d');
 var Lat=55.7667, Long=37.6667; // Москвабад.
 var az=180, yz=0, dh=0.95, zoom=1, jd=JD(), E=ec();
 var conlines=1, gridlines=1, connames=1, starnames=0, ref=1, vmod=2;
-var planets=1, planetnames=2;
+var planets=1, planetnames=1;
 var star=[], planet=[], clinX, clinY, clinH, knot=[];
 
 // База созвездий на эпоху J2000.
@@ -967,10 +967,19 @@ var starsBase = [
 
 ];
 
-// База объектов солнечной системы на эпоху J2000.
-// Тип, обозначение, название, средняя долгота, аргумент перицентра, эксцентриситет.
+// База объектов Солнечной системы на эпоху J2000.
+// Тип, обозначение, название, период обращения, большая полуось, эксцентриситет, наклонение, долгота восходящего узла, аргкмент перицентра, средняя долгота, цвет.
 var solSys = [
-0, "☉", "Солнце", 280.46435, 282.94719, 0.016718,
+0, "☉", "Солнце", 1, 1, 0.016718, 0, 0, 282.94719, 280.46435, "#ffff00",
+1, "☿", "Меркурий", 0.240846, 0.38709893, 0.205631, 7.00487, 48.33167, 77.45645, 252.25084, "#f5deb3",
+1, "♀", "Венера", 0.615198, 0.72333199, 0.00677323, 3.39471, 76.68069, 131.53298, 181.97973, "#fffff0",
+1, "♂", "Марс", 1.8808, 1.52366231, 0.09341233, 1.85061, 49.57854, 336.04084, 355.45332, "#ffa07a",
+1, "♃", "Юпитер", 11.8618, 5.20336301, 0.04839266, 1.30530, 100.55615, 14.75385, 34.40438, "#faf0e6",
+1, "♄", "Сатурн", 29.4571, 9.53707032, 0.05415060, 2.48446, 113.71504, 92.43194, 49.94432, "#ffefd5",
+1, "⛢", "Уран", 84.0205, 19.19126393, 0.04716771, 0.76986, 74.22988, 170.96424, 313.23218, "#afeeee",
+1, "♆", "Нептун", 164.8, 30.06896348, 0.00858587, 1.76917, 131.72169, 44.97135, 304.88003, "#f0ffff",
+1, "♇", "Плутон", 248, 39.48168677, 0.24880766, 17.14175, 110.30347, 224.06676, 238.92881, "#ffebcd",
+
 ];
 
 // Загрузка сохраненного состояния.
@@ -994,15 +1003,20 @@ for (var i=0, n=8; i<starsBase.length/n; i++ ) {
 	star[i].line=starsBase[i*n+7];
 }
 
-// Преобразование базы объектов солнечной системы.
-for (var i=0, n=6; i<solSys.length/n; i++ ) {
+// Преобразование базы объектов Солнечной системы.
+for (var i=0, n=11; i<solSys.length/n; i++ ) {
 	planet[i]={};
 	planet[i].id=solSys[i*n];
 	planet[i].name1=solSys[i*n+1];
 	planet[i].name2=solSys[i*n+2];
-	planet[i].M0=solSys[i*n+3];
-	planet[i].w=solSys[i*n+4];
+	planet[i].T=solSys[i*n+3];
+	planet[i].a_=solSys[i*n+4];
 	planet[i].e=solSys[i*n+5];
+	planet[i].i=solSys[i*n+6];
+	planet[i].O=solSys[i*n+7];
+	planet[i].w=solSys[i*n+8];
+	planet[i].M0=solSys[i*n+9];
+	planet[i].color=solSys[i*n+10];
 }
 
 // Ядро программы.
@@ -1223,7 +1237,7 @@ function draw() {
 // Отрисовка созвездий.
 function stars() {
 	if (vmod==2) context.fillStyle="silver";
-	for (var i=0; i<star.length; i++) {
+	for (var i=0, len=star.length; i<len; i++) {
 		if (star[i].id==0 && star[i].h>0 && connames!=0) {
 			var x=hA_to_x(star[i].h, star[i].A+az);
 			var y=hA_to_y(star[i].h, star[i].A+az); 
@@ -1262,8 +1276,9 @@ function drawPlanets() {
 			context.arc(x, y, r, 0, 6.284);
 			context.fill();
 			if (vmod==2) context.fillStyle="silver";
-			if (planetnames==1) context.fillText(planet[i].name1, x+10, y-20);
-			if (planetnames==2) context.fillText(planet[i].name2, x+10, y-20);
+			if (i==0) y-=5;
+			if (planetnames==1) context.fillText(planet[i].name2, x+10, y-15);
+			if (planetnames==2) context.fillText(planet[i].name1, x+10, y-15);
 		}
 	}
 }
@@ -1360,7 +1375,7 @@ function cline(x, y, i) {
 // Расчет положения светил.
 function calc() {
 	jd=JD();
-	sun();
+	calcPlanets();
 	var lstime=LST();
 	for (var i=0; i<star.length; i++) {
 		star[i].h=ad_to_h(star[i].a, star[i].d, lstime);
@@ -1375,26 +1390,55 @@ function calc() {
 	draw();
 }
 
-// Расчет положения Солнца.
-function sun() {
+// Расчет положения Солнца и планет.
+function calcPlanets() {
 	var k=Math.PI/180;
-	var M=(360/365.2422*(jd-2451545)+planet[0].M0-planet[0].w)%360;
-	//planet[0].l=(M+2*planet[0].e*Math.sin(M*k)/k+planet[0].w)%360; // Уравнение центра.
-	//--------------- Решение уравнения Кеплера.
-	var E=M*k;
-	for (var i=0; i<5; i++)
-		E=planet[0].e*Math.sin(E)+M*k;
-	var tgv=Math.sqrt((1+planet[0].e)/(1-planet[0].e))*Math.tan(E/2);
-	var l=Math.atan(tgv)/k*2+planet[0].w;
-	if (l<0) l+=360;
-	if (l>360) l-=360;
-	planet[0].l=l;
-	//---------------
-	planet[0].b=0;
-	planet[0].a=lb_to_a(planet[0].l, planet[0].b);
-	planet[0].d=lb_to_d(planet[0].l, planet[0].b);
-	planet[0].m=-26.74;
-	planet[0].color="yellow";
+	for (var i=0; i<planet.length; i++) {
+		var M=(360/365.2422*(jd-2451545)/planet[i].T+planet[i].M0-planet[i].w)%360;
+		//planet[i].l=(M+2*planet[i].e*Math.sin(M*k)/k+planet[i].w)%360; // Уравнение центра.
+		//--------------- Решение уравнения Кеплера.
+		var E=M*k;
+		for (var j=0; j<5; j++) E=planet[i].e*Math.sin(E)+M*k;
+		var tgv=Math.sqrt((1+planet[i].e)/(1-planet[i].e))*Math.tan(E/2);
+		var v=Math.atan(tgv)/k*2;
+		//---------------
+		var l=v+planet[i].w;
+		l=(l+360)%360;
+		planet[i].r=planet[i].a_*(1-planet[i].e*planet[i].e)/(1+planet[i].e*Math.cos(v*k));
+		if (i>0) {
+			var L=planet[0].l+180;
+			var R=planet[0].r;
+			var P=Math.asin(Math.sin((l-planet[i].O)*k)*Math.sin(planet[i].i*k))/k;
+			var y=Math.sin((l-planet[i].O)*k)*Math.cos(planet[i].i*k);
+			var x=Math.cos((l-planet[i].O)*k);
+			var l_=Math.atan(y/x)/k+planet[i].O;
+			if (x<0) l_+=180;
+			var r_=planet[i].r*Math.cos(P*k);
+			if (planet[i].a_>1) {
+				var y=R*Math.sin((l_-L)*k);
+				var x=r_-R*Math.cos((l_-L)*k);
+				var at=Math.atan(y/x)/k;
+				planet[i].l=at+l_;
+			}
+			else {
+				var y=r_*Math.sin((L-l_)*k);
+				var x=R-r_*Math.cos((L-l_)*k);
+				var at=Math.atan(y/x)/k;
+				planet[i].l=at+L+180;
+			}
+			var y=r_*Math.tan(P*k)*Math.sin((planet[i].l-l_)*k);
+			var x=R*Math.sin((l_-L)*k);
+			planet[i].b=Math.atan(y/x)/k;
+			planet[i].m=-3; // test
+		}
+		else {
+			planet[0].l=l;
+			planet[0].b=0;
+			planet[0].m=-26.74;
+		}
+		planet[i].a=lb_to_a(planet[i].l, planet[i].b);
+		planet[i].d=lb_to_d(planet[i].l, planet[i].b);
+	}
 }
 
 // Горизонт и стороны света.
@@ -1542,8 +1586,8 @@ function lb_to_a(l, b) {
 	var y=Math.sin(l*k)*Math.cos(E*k)-Math.tan(b*k)*Math.sin(E*k);
 	var x=Math.cos(l*k);
 	var a=Math.atan(y/x)/k;
-	if (x<0) return (180+a)/15;
-	if (x>0 && y<0) return (360+a)/15;
+	if (x<0) a+=180;
+	return a/15;
 }
 
 function lb_to_d(l, b) {
