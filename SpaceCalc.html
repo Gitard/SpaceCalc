@@ -36,6 +36,7 @@ var az=180, yz=0, dh=0.95, zoom=1, jd=JD(), E=ec();
 var conlines=1, gridlines=1, connames=1, starnames=0, ref=1, vmod=2;
 var planets=1, planetnames=1;
 var star=[], planet=[], clinX, clinY, clinH, knot=[];
+var k=Math.PI/180;
 
 // База созвездий на эпоху J2000.
 // Тип, обозначение, название, прямое восхождение, склонение, зв. величина, цвет, код линии.
@@ -1378,8 +1379,8 @@ function cline(x, y, i) {
 // Расчет положения светил.
 function calc() {
 	jd=JD();
-	calcPlanets();
 	var lstime=LST();
+	calcPlanets(lstime);
 	for (var i=0; i<star.length; i++) {
 		star[i].h=ad_to_h(star[i].a, star[i].d, lstime);
 		star[i].A=ad_to_A(star[i].a, star[i].d, lstime, star[i].h);
@@ -1394,8 +1395,7 @@ function calc() {
 }
 
 // Расчет положения Солнца и планет.
-function calcPlanets() {
-	var k=Math.PI/180;
+function calcPlanets(lstime) {
 	var D=jd-2451545;
 	for (var i=0; i<planet.length; i++) {
 		if (planet[i].id==1) { // Луна
@@ -1408,8 +1408,8 @@ function calcPlanets() {
 			var Ae=0.1858*Math.sin(planet[0].M*k);
 			var A3=0.37*Math.sin(planet[0].M*k);
 			M=M+Ev-Ae-A3;
+			// Уравнение центра.
 			var Ec=6.2886*Math.sin(M*k);
-			// ???
 			var A4=0.214*Math.sin(2*M*k);
 			l=l+Ev+Ec-Ae+A4;
 			var V=0.6583*Math.sin(2*(l-planet[0].l)*k);
@@ -1422,6 +1422,9 @@ function calcPlanets() {
 			planet[i].l=l;
 			var sinb=Math.sin((l-N)*k)*Math.sin(planet[i].i*k);
 			planet[i].b=Math.asin(sinb)/k;
+			var v=M+Ec;
+			var r=planet[i].a_*(1-planet[i].e*planet[i].e)/(1+planet[i].e*Math.cos(v*k));
+			planet[i].r=r*1496e5/6378.14;
 			planet[i].m=-12.74; // тест
 		}
 		else {
@@ -1475,6 +1478,18 @@ function calcPlanets() {
 		}
 		planet[i].a=lb_to_a(planet[i].l, planet[i].b);
 		planet[i].d=lb_to_d(planet[i].l, planet[i].b);
+		// Параллакс Луны, высота и форма геоида не учитываются.
+		if (planet[i].id==1) {
+			var H=lstime-planet[i].a;
+			var y=Math.cos(Lat*k)*Math.sin(H*15*k);
+			var x=planet[i].r*Math.cos(planet[i].d*k)-Math.cos(Lat*k)*Math.cos(H*15*k);
+			var D=Math.atan(y/x)/k/15;
+			planet[i].a-=D;
+			var H_=H+D;
+			var y=planet[i].r*Math.sin(planet[i].d*k)-Math.sin(Lat*k);
+			var x=planet[i].r*Math.cos(planet[i].d*k)*Math.cos(H*15*k)-Math.cos(Lat*k);
+			planet[i].d=Math.atan(Math.cos(H_*15*k)*y/x)/k;
+		}
 	}
 }
 
@@ -1531,7 +1546,6 @@ function grid() {
 // Учет прецессии
 function precession() {
 	var N = (jd-2451545)/365.25/3600;
-	var k = Math.PI/180;
 	for (var i=0; i<star.length; i++ ) {
 		star[i].a = star[i].a0 + (3.0742+1.33589*Math.sin(15*k*star[i].a0)*Math.tan(k*star[i].d0))*N;
 		star[i].d = star[i].d0 + 20.0383*Math.cos(15*k*star[i].a0)*N;
@@ -1595,22 +1609,20 @@ function hms_to_h(hms) {
 
 // Функции перевода азимутальной проекции на холст.
 function hA_to_x(h, A) {
-	return canvas.width/2+(canvas.height*dh*zoom*(1-h/90))*Math.sin(A*Math.PI/180);
+	return canvas.width/2+(canvas.height*dh*zoom*(1-h/90))*Math.sin(A*k);
 }
 
 function hA_to_y(h, A) {
-	return (canvas.height*dh*zoom*(1-h/90))*Math.cos(A*Math.PI/180)+yz*canvas.height;
+	return (canvas.height*dh*zoom*(1-h/90))*Math.cos(A*k)+yz*canvas.height;
 }
 
 // Функции перехода от экваториальных координат к горизонтальным.
 function ad_to_h(a, d, lst) {
-	var k=Math.PI/180;
 	var sinh=Math.sin(d*k)*Math.sin(Lat*k)+Math.cos(d*k)*Math.cos(Lat*k)*Math.cos(15*k*(lst-a));
 	return Math.asin(sinh)/k;
 }
 
 function ad_to_A(a, d, lst, h) {
-	var k=Math.PI/180;
 	var cosA=(Math.sin(d*k)-Math.sin(h*k)*Math.sin(Lat*k))/Math.cos(h*k)/Math.cos(Lat*k);
 	var A=Math.acos(cosA)/k;
 	if (Math.sin(15*k*(lst-a))<0) return A;
@@ -1619,7 +1631,6 @@ function ad_to_A(a, d, lst, h) {
 
 // Функции перехода от эклиптических координатат к экваториальным.
 function lb_to_a(l, b) {
-	var k=Math.PI/180;
 	var y=Math.sin(l*k)*Math.cos(E*k)-Math.tan(b*k)*Math.sin(E*k);
 	var x=Math.cos(l*k);
 	var a=Math.atan(y/x)/k;
@@ -1628,7 +1639,6 @@ function lb_to_a(l, b) {
 }
 
 function lb_to_d(l, b) {
-	var k=Math.PI/180;
 	var sinD=Math.sin(b*k)*Math.cos(E*k)+Math.cos(b*k)*Math.sin(E*k)*Math.sin(l*k);
 	return Math.asin(sinD)/k
 }
