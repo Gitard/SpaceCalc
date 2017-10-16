@@ -1221,6 +1221,7 @@ function draw() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	context.font = "12px Arial";
+	if (az%1==0) az+=0.0001; // костыль для хромог
 	if (vmod>1) context.fillStyle="black";
 	else context.fillStyle="white";
 	context.fillRect(0, 0, canvas.width, canvas.height);
@@ -1478,7 +1479,7 @@ function calcPlanets(lstime) {
 		}
 		planet[i].a=lb_to_a(planet[i].l, planet[i].b);
 		planet[i].d=lb_to_d(planet[i].l, planet[i].b);
-		// Параллакс Луны, высота и форма геоида не учитываются.
+		// Параллакс Луны. Высота и форма геоида не учитываются.
 		if (planet[i].id==1) {
 			var H=lstime-planet[i].a;
 			var y=Math.cos(Lat*k)*Math.sin(H*15*k);
@@ -1532,7 +1533,9 @@ function grid() {
 	else context.lineWidth = 0.05;
 	for (i=1; i<n; i++) {
 		context.beginPath();
-		context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*i/n*zoom, 0, 6.284);
+		var R=canvas.height*dh*zoom;
+		var f=i*10*k;
+		context.arc(canvas.width/2, yz*canvas.height, R*Math.cos(f)/(1+Math.sin(f)), 0, 6.284);
 		context.stroke();
 	}
 	for (i=-n; i<n; i++) {
@@ -1609,11 +1612,13 @@ function hms_to_h(hms) {
 
 // Функции перевода азимутальной проекции на холст.
 function hA_to_x(h, A) {
-	return canvas.width/2+(canvas.height*dh*zoom*(1-h/90))*Math.sin(A*k);
+	var r=canvas.height*dh*zoom*Math.cos(h*k)/(1+Math.sin(h*k));
+	return canvas.width/2+r*Math.sin(A*k);
 }
 
 function hA_to_y(h, A) {
-	return (canvas.height*dh*zoom*(1-h/90))*Math.cos(A*k)+yz*canvas.height;
+	var r=canvas.height*dh*zoom*Math.cos(h*k)/(1+Math.sin(h*k));
+	return r*Math.cos(A*k)+yz*canvas.height;
 }
 
 // Функции перехода от экваториальных координат к горизонтальным.
