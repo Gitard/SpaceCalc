@@ -1397,7 +1397,7 @@ function calc() {
 
 // Расчет положения Солнца и планет.
 function calcPlanets(lstime) {
-	var D=jd-2451545;
+	var D=jd-2451545; // J2000
 	for (var i=0; i<planet.length; i++) {
 		if (planet[i].id==1) { // Луна
 			var l=360/365.2422*D/planet[i].T+planet[i].l0;
@@ -1409,12 +1409,11 @@ function calcPlanets(lstime) {
 			var Ae=0.1858*Math.sin(planet[0].M*k);
 			var A3=0.37*Math.sin(planet[0].M*k);
 			M=M+Ev-Ae-A3;
-			// Уравнение центра.
-			var Ec=6.2886*Math.sin(M*k);
+			var Ec=6.2886*Math.sin(M*k); // Уравнение центра.
 			var A4=0.214*Math.sin(2*M*k);
 			l=l+Ev+Ec-Ae+A4;
 			var V=0.6583*Math.sin(2*(l-planet[0].l)*k);
-			var l=l+V;
+			l=l+V;
 			N=N-0.16*Math.sin(planet[0].M*k);
 			var y=Math.sin((l-N)*k)*Math.cos(planet[i].i*k);
 			var x=Math.cos((l-N)*k);
@@ -1425,8 +1424,10 @@ function calcPlanets(lstime) {
 			planet[i].b=Math.asin(sinb)/k;
 			var v=M+Ec;
 			var r=planet[i].a_*(1-planet[i].e*planet[i].e)/(1+planet[i].e*Math.cos(v*k));
-			planet[i].r=r*1496e5/6378.14;
-			planet[i].m=-12.74; // тест
+			planet[i].r=r;
+			var F=(1-Math.cos((planet[i].l-planet[0].l)*k))/2;
+			planet[i].F=F;
+			planet[i].m=5*Math.log(r/planet[i].R/Math.sqrt(F*planet[i].Al))/Math.log(10)-26.74;
 		}
 		else {
 			var M=(360/365.2422*D/planet[i].T+planet[i].l0-planet[i].w)%360;
@@ -1481,14 +1482,15 @@ function calcPlanets(lstime) {
 		planet[i].d=lb_to_d(planet[i].l, planet[i].b);
 		// Параллакс Луны. Высота и форма геоида не учитываются.
 		if (planet[i].id==1) {
+			var r=planet[i].r*1496e5/6378.14;
 			var H=lstime-planet[i].a;
 			var y=Math.cos(Lat*k)*Math.sin(H*15*k);
-			var x=planet[i].r*Math.cos(planet[i].d*k)-Math.cos(Lat*k)*Math.cos(H*15*k);
+			var x=r*Math.cos(planet[i].d*k)-Math.cos(Lat*k)*Math.cos(H*15*k);
 			var Delta=Math.atan(y/x)/k/15;
 			planet[i].a-=Delta;
 			var H_=H+Delta;
-			var y=planet[i].r*Math.sin(planet[i].d*k)-Math.sin(Lat*k);
-			var x=planet[i].r*Math.cos(planet[i].d*k)*Math.cos(H*15*k)-Math.cos(Lat*k);
+			var y=r*Math.sin(planet[i].d*k)-Math.sin(Lat*k);
+			var x=r*Math.cos(planet[i].d*k)*Math.cos(H*15*k)-Math.cos(Lat*k);
 			planet[i].d=Math.atan(Math.cos(H_*15*k)*y/x)/k;
 		}
 	}
@@ -1510,7 +1512,7 @@ function skyline() {
 		context.moveTo(hA_to_x(0, A), hA_to_y(0, A));
 		context.lineTo(hA_to_x(-0.7, A), hA_to_y(-0.7, A));
 		context.stroke();
-		context.fillText(carDir[i], hA_to_x(-3, A), hA_to_y(-3, A));
+		context.fillText(carDir[i], hA_to_x(-2, A), hA_to_y(-2, A));
 	}
 	context.beginPath();
 	context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*zoom, 0, 6.284);
