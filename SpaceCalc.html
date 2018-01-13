@@ -979,8 +979,10 @@ var solSys = [
 2, "♃", "Юпитер", 11.8618, 5.20336301, 0.04839266, 1.30530, 100.55615, 14.75385, 34.40438, "#faf0e6", 69911, 0.52,
 2, "♄", "Сатурн", 29.4571, 9.53707032, 0.05415060, 2.48446, 113.71504, 92.43194, 49.94432, "#ffefd5", 58232, 0.47,
 2, "⛢", "Уран", 84.0205, 19.19126393, 0.04716771, 0.76986, 74.22988, 170.96424, 313.23218, "#afeeee", 25362, 0.51,
+/* Слишком тусклые планеты.
 2, "♆", "Нептун", 164.8, 30.06896348, 0.00858587, 1.76917, 131.72169, 44.97135, 304.88003, "#f0ffff", 24622, 0.41,
 2, "♇", "Плутон", 248, 39.48168677, 0.24880766, 17.14175, 110.30347, 224.06676, 238.92881, "#ffebcd", 1187, 0.6,
+*/
 
 ];
 
@@ -1272,20 +1274,55 @@ function stars() {
 function drawPlanets() {
 	if (vmod==2) context.fillStyle="silver";
 	for (var i=0; i<planet.length; i++) {
-		var x=hA_to_x(planet[i].h, planet[i].A+az);
-		var y=hA_to_y(planet[i].h, planet[i].A+az);
-		var r=3.2-0.4*planet[i].m;
-		if (r<0.3) r=0.3;
 		if (planet[i].h>-1) {
+			var x=hA_to_x(planet[i].h, planet[i].A+az);
+			var y=hA_to_y(planet[i].h, planet[i].A+az);
+			var r=3.2-0.4*planet[i].m;
+			if (r<0.3) r=0.3;
 			if (vmod==2) context.fillStyle=planet[i].color;
-			context.beginPath();
-			context.arc(x, y, r, 0, 6.284);
-			context.fill();
+			if (i>0 && i<5) {
+				var sin=Math.sin(planet[i].A*k)*Math.cos(Lat*k)/Math.cos(planet[i].d*k);
+				var N=Math.asin(sin)/k;
+				if (Lat<0) N=180-N;
+				var a=180-planet[i].A-az-N-planet[i].K;
+				crescent(x, y, r, a, planet[i].F);
+			}
+			else {
+				context.beginPath();
+				context.arc(x, y, r, 0, 6.284);
+				context.fill();
+			}
 			if (vmod==2) context.fillStyle="silver";
 			if (planetnames==1) context.fillText(planet[i].name2, x+10, y-10-r);
 			if (planetnames==2) context.fillText(planet[i].name1, x+10, y-10-r);
 		}
 	}
+}
+
+// Построение серпа светила
+function crescent(x, y, r, a, f) {
+	var ak=a*k;
+	var dx=r*Math.cos(ak);
+	var dy=r*Math.sin(ak);
+	var x1=x+dx;
+	var x2=x-dx;
+	var y1=y+dy;
+	var y2=y-dy;
+	var i=4/3*(2*f-1); // тест
+	dx*=i;
+	dy*=i;
+	context.save();
+	if (vmod==2) context.fillStyle="#181818";
+	else if (vmod==3) context.fillStyle="#180000";
+	else context.fillStyle="#e9e9e9";
+	context.beginPath();
+	context.arc(x, y, r, 0, 2*Math.PI);
+	context.fill();
+	context.restore();
+	context.beginPath();
+	context.arc(x, y, r, ak, Math.PI+ak);
+	context.bezierCurveTo(x2+dy, y2-dx, x1+dy, y1-dx, x1, y1);
+	context.fill();
 }
 
 // Построение линий созвездий.
@@ -1492,6 +1529,16 @@ function calcPlanets(lstime) {
 			var y=r*Math.sin(planet[i].d*k)-Math.sin(Lat*k);
 			var x=r*Math.cos(planet[i].d*k)*Math.cos(H*15*k)-Math.cos(Lat*k);
 			planet[i].d=Math.atan(Math.cos(H_*15*k)*y/x)/k;
+		}
+		if (i>0 && i<5) { // Угол светлого лимба.
+			var da=(planet[0].a-planet[i].a)*15*k;
+			var d0=planet[0].d*k;
+			var d=planet[i].d*k;
+			var y=Math.cos(d0)*Math.sin(da);
+			var x=Math.cos(d)*Math.sin(d0)-Math.sin(d)*Math.cos(d0)*Math.cos(da);
+			var K=Math.atan(y/x)/k;
+			if (x<0) K+=180;
+			planet[i].K=K;
 		}
 	}
 }
