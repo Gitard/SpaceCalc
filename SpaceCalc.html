@@ -971,7 +971,7 @@ var starsBase = [
 // База объектов Солнечной системы на эпоху J2000.
 // Тип, обозначение, название, период обращения, большая полуось, эксцентриситет, наклонение, долгота восходящего узла, аргумент перицентра, средняя долгота, цвет, радиус, альбедо.
 var solSys = [
-0, "☉", "Солнце", 1, 1, 0.016718, 0, 0, 282.94719, 280.46435, "#ffff00", 0, 0,
+0, "☉", "Солнце", 1, 1, 0.016718, 0, 0, 282.94719, 280.46435, "#ffff00", 695510, 0,
 1, "☾", "Луна", 0.074804012, 0.0025695, 0.0554, 5.16, 125.08, 318.15, 218.5, "#dfc691", 1737.4, 0.12,
 2, "☿", "Меркурий", 0.240846, 0.38709893, 0.205631, 7.00487, 48.33167, 77.45645, 252.25084, "#f5deb3", 2439.7, 0.142,
 2, "♀", "Венера", 0.615198, 0.72333199, 0.00677323, 3.39471, 76.68069, 131.53298, 181.97973, "#fffff0", 6051.8, 0.67,
@@ -1277,7 +1277,9 @@ function drawPlanets() {
 		if (planet[i].h>-1) {
 			var x=hA_to_x(planet[i].h, planet[i].A+az);
 			var y=hA_to_y(planet[i].h, planet[i].A+az);
+			var R=canvas.height*dh*zoom/90*planet[i].q/(1+Math.sin(planet[i].h*k))*4/Math.PI; // тест
 			var r=3.2-0.4*planet[i].m;
+			if (R>r) r=R;
 			if (r<0.3) r=0.3;
 			if (vmod==2) context.fillStyle=planet[i].color;
 			if (i>0 && i<5) {
@@ -1285,7 +1287,7 @@ function drawPlanets() {
 				var N=Math.asin(sin)/k;
 				if (Lat<0) N=180-N;
 				var a=180-planet[i].A-az-N-planet[i].K;
-				crescent(x, y, r, a, planet[i].F);
+				crescent(x, y, r, a*k, planet[i].F);
 			}
 			else {
 				context.beginPath();
@@ -1301,9 +1303,8 @@ function drawPlanets() {
 
 // Построение серпа светила
 function crescent(x, y, r, a, f) {
-	var ak=a*k;
-	var dx=r*Math.cos(ak);
-	var dy=r*Math.sin(ak);
+	var dx=r*Math.cos(a);
+	var dy=r*Math.sin(a);
 	var x1=x+dx;
 	var x2=x-dx;
 	var y1=y+dy;
@@ -1320,7 +1321,7 @@ function crescent(x, y, r, a, f) {
 	context.fill();
 	context.restore();
 	context.beginPath();
-	context.arc(x, y, r, ak, Math.PI+ak);
+	context.arc(x, y, r, a, Math.PI+a);
 	context.bezierCurveTo(x2+dy, y2-dx, x1+dy, y1-dx, x1, y1);
 	context.fill();
 }
@@ -1436,7 +1437,7 @@ function calc() {
 function calcPlanets(lstime) {
 	var D=jd-2451545; // J2000
 	for (var i=0; i<planet.length; i++) {
-		if (planet[i].id==1) { // Луна
+		if (i==1) { // Луна
 			var l=360/365.2422*D/planet[i].T+planet[i].l0;
 			var M=l-0.1114041*D-planet[i].w-planet[i].O;
 			var N=planet[i].O-0.0529539*D;
@@ -1479,7 +1480,7 @@ function calcPlanets(lstime) {
 			var r=planet[i].a_*(1-planet[i].e*planet[i].e)/(1+planet[i].e*Math.cos(v*k));
 			planet[i].r=r;
 		}
-		if (planet[i].id==2) {
+		if (i>1) {
 			var L=planet[0].l+180;
 			var R=planet[0].r;
 			var P=Math.asin(Math.sin((l-planet[i].O)*k)*Math.sin(planet[i].i*k))/k;
@@ -1509,16 +1510,17 @@ function calcPlanets(lstime) {
 			planet[i].F=F;
 			planet[i].m=5*Math.log(r*p/planet[i].R/Math.sqrt(F*planet[i].Al))/Math.log(10)-26.74;
 		}
-		else if (planet[i].id==0) {
+		else if (i==0) {
 			planet[0].M=M;
 			planet[0].l=l;
 			planet[0].b=0;
 			planet[0].m=-26.74;
+			planet[0].p=planet[0].r;
 		}
 		planet[i].a=lb_to_a(planet[i].l, planet[i].b);
 		planet[i].d=lb_to_d(planet[i].l, planet[i].b);
-		// Параллакс Луны. Высота и форма геоида не учитываются.
-		if (planet[i].id==1) {
+		// Параллакс Луны. Высота местности и форма геоида не учитываются.
+		if (i==1) {
 			var r=planet[i].r*1496e5/6378.14;
 			var H=lstime-planet[i].a;
 			var y=Math.cos(Lat*k)*Math.sin(H*15*k);
@@ -1529,8 +1531,10 @@ function calcPlanets(lstime) {
 			var y=r*Math.sin(planet[i].d*k)-Math.sin(Lat*k);
 			var x=r*Math.cos(planet[i].d*k)*Math.cos(H*15*k)-Math.cos(Lat*k);
 			planet[i].d=Math.atan(Math.cos(H_*15*k)*y/x)/k;
+			planet[i].p=planet[i].r;  // тест
 		}
-		if (i>0 && i<5) { // Угол светлого лимба.
+		// Угол светлого лимба.
+		if (i>0 && i<5) {
 			var da=(planet[0].a-planet[i].a)*15*k;
 			var d0=planet[0].d*k;
 			var d=planet[i].d*k;
@@ -1540,6 +1544,7 @@ function calcPlanets(lstime) {
 			if (x<0) K+=180;
 			planet[i].K=K;
 		}
+		planet[i].q=Math.atan(planet[i].R/planet[i].p)/k;
 	}
 }
 
