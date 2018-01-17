@@ -1303,15 +1303,9 @@ function drawPlanets() {
 
 // Построение серпа светила
 function crescent(x, y, r, a, f) {
-	var dx=r*Math.cos(a);
-	var dy=r*Math.sin(a);
-	var x1=x+dx;
-	var x2=x-dx;
-	var y1=y+dy;
-	var y2=y-dy;
-	var i=4/3*(2*f-1); // тест
-	dx*=i;
-	dy*=i;
+	var sin=Math.sin(a);
+	var cos=Math.cos(a);
+	var rb=2*r*(f-0.5); // тест
 	context.save();
 	if (vmod==2) context.fillStyle="#181818";
 	else if (vmod==3) context.fillStyle="#180000";
@@ -1322,7 +1316,12 @@ function crescent(x, y, r, a, f) {
 	context.restore();
 	context.beginPath();
 	context.arc(x, y, r, a, Math.PI+a);
-	context.bezierCurveTo(x2+dy, y2-dx, x1+dy, y1-dx, x1, y1);
+	for (var i=0; i<180; i+=10) {
+		var j=(i+180)*k;
+		var xx=r*Math.cos(j);
+		var yy=rb*Math.sin(j);
+		context.lineTo(xx*cos-yy*sin+x, xx*sin+yy*cos+y);
+	}
 	context.fill();
 }
 
