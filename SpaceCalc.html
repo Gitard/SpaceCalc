@@ -1278,7 +1278,7 @@ function drawPlanets() {
 			var x=hA_to_x(planet[i].h, planet[i].A+az);
 			var y=hA_to_y(planet[i].h, planet[i].A+az);
 			var R=canvas.height*dh*zoom/90*planet[i].q;
-			R*=Math.pow(Math.cos((45-planet[i].h/2)*k), 2);
+			R/=Math.pow(Math.cos((45-planet[i].h/2)*k), 2);
 			var r=3.2-0.4*planet[i].m;
 			if (R>r) r=R;
 			if (r<0.3) r=0.3;
@@ -1523,15 +1523,19 @@ function calcPlanets(lstime) {
 		if (i==1) {
 			var r=planet[i].r*1496e5/6378.14;
 			var H=lstime-planet[i].a;
-			var y=Math.cos(Lat*k)*Math.sin(H*15*k);
-			var x=r*Math.cos(planet[i].d*k)-Math.cos(Lat*k)*Math.cos(H*15*k);
-			var Delta=Math.atan(y/x)/k/15;
+			var rsind=r*Math.sin(planet[i].d*k);
+			var rcosd=r*Math.cos(planet[i].d*k);
+			var sinf=Math.sin(Lat*k);
+			var cosf=Math.cos(Lat*k);
+			var sinH=Math.sin(H*15*k);
+			var cosH=Math.cos(H*15*k);
+			var x=cosf*sinH;
+			var y=rcosd-cosf*cosH;
+			var z=rsind-sinf;
+			var Delta=Math.atan(x/y)/k/15;
 			planet[i].a-=Delta;
-			var H_=H+Delta;
-			var y=r*Math.sin(planet[i].d*k)-Math.sin(Lat*k);
-			var x=r*Math.cos(planet[i].d*k)*Math.cos(H*15*k)-Math.cos(Lat*k);
-			planet[i].d=Math.atan(Math.cos(H_*15*k)*y/x)/k;
-			planet[i].p=planet[i].r;  // тест
+			planet[i].d=Math.atan(Math.cos((H+Delta)*15*k)*z/(rcosd*cosH-cosf))/k;
+			planet[i].p=Math.sqrt(x*x+y*y+z*z)/1496e5*6378.14;
 		}
 		// Угол светлого лимба.
 		if (i>0 && i<5) {
