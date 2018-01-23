@@ -979,10 +979,8 @@ var solSys = [
 2, "♃", "Юпитер", 11.8618, 5.20336301, 0.04839266, 1.30530, 100.55615, 14.75385, 34.40438, "#faf0e6", 69911, 0.52,
 2, "♄", "Сатурн", 29.4571, 9.53707032, 0.05415060, 2.48446, 113.71504, 92.43194, 49.94432, "#ffefd5", 58232, 0.47,
 2, "⛢", "Уран", 84.0205, 19.19126393, 0.04716771, 0.76986, 74.22988, 170.96424, 313.23218, "#afeeee", 25362, 0.51,
-/* Слишком тусклые планеты.
 2, "♆", "Нептун", 164.8, 30.06896348, 0.00858587, 1.76917, 131.72169, 44.97135, 304.88003, "#f0ffff", 24622, 0.41,
 2, "♇", "Плутон", 248, 39.48168677, 0.24880766, 17.14175, 110.30347, 224.06676, 238.92881, "#ffebcd", 1187, 0.6,
-*/
 
 ];
 
@@ -996,33 +994,35 @@ if (localStorage.getItem("sc_vmod")) vmod = +localStorage.getItem("sc_vmod");
 
 // Преобразование базы звезд в удобочитаемый вид.
 for (var i=0, n=8; i<starsBase.length/n; i++ ) {
+	var j=i*n;
 	star[i]={};
-	star[i].id=starsBase[i*n];
-	star[i].name1=starsBase[i*n+1];
-	star[i].name2=starsBase[i*n+2];
-	star[i].a0=hms_to_h(starsBase[i*n+3]);
-	star[i].d0=hms_to_h(starsBase[i*n+4]);
-	star[i].m=starsBase[i*n+5];
-	star[i].color=starsColor(starsBase[i*n+6]);
-	star[i].line=starsBase[i*n+7];
+	star[i].id=starsBase[j++];
+	star[i].name1=starsBase[j++];
+	star[i].name2=starsBase[j++];
+	star[i].a0=hms_to_h(starsBase[j++]);
+	star[i].d0=hms_to_h(starsBase[j++]);
+	star[i].m=starsBase[j++];
+	star[i].color=starsColor(starsBase[j++]);
+	star[i].line=starsBase[j++];
 }
 
 // Преобразование базы объектов Солнечной системы.
 for (var i=0, n=13; i<solSys.length/n; i++ ) {
+	var j=i*n;
 	planet[i]={};
-	planet[i].id=solSys[i*n];
-	planet[i].name1=solSys[i*n+1];
-	planet[i].name2=solSys[i*n+2];
-	planet[i].T=solSys[i*n+3];
-	planet[i].a_=solSys[i*n+4];
-	planet[i].e=solSys[i*n+5];
-	planet[i].i=solSys[i*n+6];
-	planet[i].O=solSys[i*n+7];
-	planet[i].w=solSys[i*n+8];
-	planet[i].l0=solSys[i*n+9];
-	planet[i].color=solSys[i*n+10];
-	planet[i].R=solSys[i*n+11]/1496e5;
-	planet[i].Al=solSys[i*n+12];
+	planet[i].id=solSys[j++];
+	planet[i].name1=solSys[j++];
+	planet[i].name2=solSys[j++];
+	planet[i].T=solSys[j++];
+	planet[i].a_=solSys[j++];
+	planet[i].e=solSys[j++];
+	planet[i].i=solSys[j++];
+	planet[i].O=solSys[j++];
+	planet[i].w=solSys[j++];
+	planet[i].l0=solSys[j++];
+	planet[i].color=solSys[j++];
+	planet[i].R=solSys[j++]/1496e5;
+	planet[i].Al=solSys[j++];
 }
 
 // Ядро программы.
@@ -1135,13 +1135,13 @@ window.onkeyup = function(event) {
 			break;
 		case 67: // C - задать свои координаты
 			var sLat = prompt('Вводи широту в градусах', Lat);
-			if (sLat != null) {
+			if (sLat!=null && +sLat>=-90 && +sLat<=90) {
 				Lat=+sLat;
 				if (Math.abs(Lat)==90) Lat-=Math.sign(Lat)*0.0001;
 				localStorage.setItem("sc_latitude", Lat);
 			}
 			var sLong = prompt('Вводи долготу в градусах', Long);
-			if (sLong != null) {
+			if (sLong!=null && +sLong>=-180 && +sLong<=180) {
 				Long=+sLong;
 				localStorage.setItem("sc_longitude", Long);
 			}
@@ -1258,7 +1258,7 @@ function stars() {
 			if (star[i].h>0) {
 				if (vmod==2) context.fillStyle=star[i].color;
 				context.beginPath();
-				context.arc(x, y, r, 0, 6.284);
+				context.arc(x, y, r, 0, 2*Math.PI);
 				context.fill();
 				if (vmod==2) context.fillStyle="silver";
 				if (starnames==1) context.fillText(star[i].name2, x+10, y-10);
@@ -1277,7 +1277,8 @@ function drawPlanets() {
 		if (planet[i].h>-1) {
 			var x=hA_to_x(planet[i].h, planet[i].A+az);
 			var y=hA_to_y(planet[i].h, planet[i].A+az);
-			var R=canvas.height*dh*zoom/90*planet[i].q/(1+Math.sin(planet[i].h*k))*4/Math.PI; // тест
+			var R=canvas.height*dh*zoom/90*planet[i].q;
+			R*=Math.pow(Math.cos((45-planet[i].h/2)*k), 2);
 			var r=3.2-0.4*planet[i].m;
 			if (R>r) r=R;
 			if (r<0.3) r=0.3;
@@ -1291,7 +1292,7 @@ function drawPlanets() {
 			}
 			else {
 				context.beginPath();
-				context.arc(x, y, r, 0, 6.284);
+				context.arc(x, y, r, 0, 2*Math.PI);
 				context.fill();
 			}
 			if (vmod==2) context.fillStyle="silver";
@@ -1305,7 +1306,7 @@ function drawPlanets() {
 function crescent(x, y, r, a, f) {
 	var sin=Math.sin(a);
 	var cos=Math.cos(a);
-	var rb=2*r*(f-0.5); // тест
+	var rb=2*r*(f-0.5);
 	context.save();
 	if (vmod==2) context.fillStyle="#181818";
 	else if (vmod==3) context.fillStyle="#180000";
@@ -1566,7 +1567,7 @@ function skyline() {
 		context.fillText(carDir[i], hA_to_x(-2, A), hA_to_y(-2, A));
 	}
 	context.beginPath();
-	context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*zoom, 0, 6.284);
+	context.arc(canvas.width/2, yz*canvas.height, canvas.height*dh*zoom, 0, 2*Math.PI);
 	if (vmod==2) {
 		context.fillStyle="#080808";
 		context.fill();
@@ -1588,7 +1589,7 @@ function grid() {
 		context.beginPath();
 		var R=canvas.height*dh*zoom;
 		var f=i*10*k;
-		context.arc(canvas.width/2, yz*canvas.height, R*Math.cos(f)/(1+Math.sin(f)), 0, 6.284);
+		context.arc(canvas.width/2, yz*canvas.height, R*Math.tan(f/2), 0, 2*Math.PI);
 		context.stroke();
 	}
 	for (i=-n; i<n; i++) {
@@ -1665,12 +1666,12 @@ function hms_to_h(hms) {
 
 // Функции перевода азимутальной проекции на холст.
 function hA_to_x(h, A) {
-	var r=canvas.height*dh*zoom*Math.cos(h*k)/(1+Math.sin(h*k));
+	var r=canvas.height*dh*zoom*Math.tan((45-h/2)*k);
 	return canvas.width/2+r*Math.sin(A*k);
 }
 
 function hA_to_y(h, A) {
-	var r=canvas.height*dh*zoom*Math.cos(h*k)/(1+Math.sin(h*k));
+	var r=canvas.height*dh*zoom*Math.tan((45-h/2)*k);
 	return r*Math.cos(A*k)+yz*canvas.height;
 }
 
