@@ -978,7 +978,7 @@ var solSys = [
 2, "♂", "Марс", 1.8808, 1.52366231, 0.09341233, 1.85061, 49.57854, 336.04084, 355.45332, "#ffa07a", 3389.5, 0.15,
 2, "♃", "Юпитер", 11.8618, 5.20336301, 0.04839266, 1.30530, 100.55615, 14.75385, 34.40438, "#faf0e6", 69911, 0.52,
 2, "♄", "Сатурн", 29.4571, 9.53707032, 0.05415060, 2.48446, 113.71504, 92.43194, 49.94432, "#ffefd5", 58232, 0.47,
-2, "⛢", "Уран", 84.0205, 19.19126393, 0.04716771, 0.76986, 74.22988, 170.96424, 313.23218, "#afeeee", 25362, 0.51,
+2, "♅", "Уран", 84.0205, 19.19126393, 0.04716771, 0.76986, 74.22988, 170.96424, 313.23218, "#afeeee", 25362, 0.51,
 2, "♆", "Нептун", 164.8, 30.06896348, 0.00858587, 1.76917, 131.72169, 44.97135, 304.88003, "#f0ffff", 24622, 0.41,
 //2, "♇", "Плутон", 248, 39.48168677, 0.24880766, 17.14175, 110.30347, 224.06676, 238.92881, "#ffebcd", 1187, 0.6,
 
@@ -1286,7 +1286,7 @@ function drawPlanets() {
 			if (i>0 && i<5) {
 				var sin=Math.sin(planet[i].A*k)*Math.cos(Lat*k)/Math.cos(planet[i].d*k);
 				var N=Math.asin(sin)/k;
-				if (Lat<0) N=180-N;
+				if (Lat-planet[i].d<0) N=180-N;
 				var a=180-planet[i].A-az-N-planet[i].K;
 				crescent(x, y, r, a*k, planet[i].F);
 			}
@@ -1308,9 +1308,9 @@ function crescent(x, y, r, a, f) {
 	var cos=Math.cos(a);
 	var rb=2*r*(f-0.5);
 	context.save();
-	if (vmod==2) context.fillStyle="#181818";
-	else if (vmod==3) context.fillStyle="#180000";
-	else context.fillStyle="#e9e9e9";
+	if (vmod==2) context.fillStyle="#303030";
+	else if (vmod==3) context.fillStyle="#300000";
+	else context.fillStyle="#d0d0d0";
 	context.beginPath();
 	context.arc(x, y, r, 0, 2*Math.PI);
 	context.fill();
