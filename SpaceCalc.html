@@ -36,7 +36,7 @@ var az=180, yz=0, dh=0.95, zoom=1, jd=JD(), E=ec();
 var conlines=1, gridlines=1, connames=1, starnames=0, ref=1, vmod=2;
 var planets=1, planetnames=1;
 var star=[], planet=[], clinX, clinY, clinH, knot=[];
-var k=Math.PI/180;
+var k=Math.PI/180, m0=3.5, mmax=6;
 
 // База созвездий на эпоху J2000.
 // Тип, обозначение, название, прямое восхождение, склонение, зв. величина, цвет, код линии.
@@ -1254,7 +1254,7 @@ function stars() {
 		if (star[i].id==1) {
 			var x=hA_to_x(star[i].h, star[i].A+az);
 			var y=hA_to_y(star[i].h, star[i].A+az);
-			var r=3.2-0.4*star[i].m;
+			var r=m0*(1-star[i].m/mmax);
 			if (star[i].h>0) {
 				if (vmod==2) context.fillStyle=star[i].color;
 				context.beginPath();
@@ -1279,7 +1279,7 @@ function drawPlanets() {
 			var y=hA_to_y(planet[i].h, planet[i].A+az);
 			var R=canvas.height*dh*zoom/90*planet[i].q;
 			R/=Math.cos((45-planet[i].h/2)*k);
-			var r=3.2-0.4*planet[i].m;
+			var r=m0*(1-planet[i].m/mmax);
 			if (R>r) r=R;
 			if (r<0.3) r=0.3;
 			if (vmod==2) context.fillStyle=planet[i].color;
