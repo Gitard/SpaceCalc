@@ -15,7 +15,7 @@ html, body {
 }
 .modalwin {
 	width: 400px;
-	height: 400px;
+	height: 420px;
 	top: 10%;
 	right: 0;
 	left: 0;
@@ -37,6 +37,16 @@ var conlines=1, gridlines=1, connames=1, starnames=0, ref=1, vmod=0;
 var planets=1, planetnames=1;
 var star=[], planet=[], clinX, clinY, clinH, knot=[];
 var k=Math.PI/180, m0=3.5, mmax=6;
+var realtime=1, timerCalc, ijd=0, sjd;
+
+// База шагов времени.
+var djd = [
+	'минута', 0.00069444444,
+	'час', 0.04166666666,
+	'звездные сутки', 0.99726956633,
+	'сутки', 1,
+	'синодический месяц', 29.53058812,
+];
 
 // База цветовых режимов.
 var sc_colors = {
@@ -49,7 +59,18 @@ var sc_colors = {
 	grid: ["white", "red", "black"],
 	line_w: [0.2, 0.3, 0.2],
 	line: ["aqua", "red", "black"],
-	ashlight: ["#303030", "#300000", "#d0d0d0"]
+	ashlight: ["#303030", "#300000", "#d0d0d0"],
+};
+
+// Цвет звезд.
+var stars_color = {
+	O: "#9aafff",
+	B: "#cad7ff",
+	A: "#f8f7ff",
+	F: "#fff4ea",
+	G: "#fff2a1",
+	K: "#ffc46f",
+	M: "#ff6060",
 };
 
 // База созвездий на эпоху J2000.
@@ -1005,6 +1026,7 @@ if (localStorage.getItem("sc_zoom")) zoom = +localStorage.getItem("sc_zoom");
 if (localStorage.getItem("sc_latitude")) Lat = +localStorage.getItem("sc_latitude");
 if (localStorage.getItem("sc_longitude")) Long = +localStorage.getItem("sc_longitude");
 if (localStorage.getItem("sc_vmod")) vmod = +localStorage.getItem("sc_vmod");
+if (localStorage.getItem("sc_sjd")) sjd = +localStorage.getItem("sc_sjd");
 
 // Преобразование базы звезд в удобочитаемый вид.
 for (var i=0, n=8; i<starsBase.length/n; i++ ) {
@@ -1016,7 +1038,7 @@ for (var i=0, n=8; i<starsBase.length/n; i++ ) {
 	star[i].a0=hms_to_h(starsBase[j++]);
 	star[i].d0=hms_to_h(starsBase[j++]);
 	star[i].m=starsBase[j++];
-	star[i].color=starsColor(starsBase[j++]);
+	star[i].color=stars_color[starsBase[j++]];
 	star[i].line=starsBase[j++];
 }
 
@@ -1042,7 +1064,7 @@ for (var i=0, n=13; i<solSys.length/n; i++ ) {
 // Ядро программы.
 precession();
 calc();
-setInterval(calc, 30000);
+timerCalc = setInterval(calc, 30000);
 window.onresize = draw;
 
 // Определение местоположения из браузера.
@@ -1078,6 +1100,7 @@ window.onbeforeunload = function() {
 	localStorage.setItem("sc_yz", yz);
 	localStorage.setItem("sc_zoom", zoom);
 	localStorage.setItem("sc_vmod", vmod);
+	if (sjd) localStorage.setItem("sc_sjd", sjd);
 }
 
 // Назначение клавиш нажатия.
@@ -1117,6 +1140,34 @@ window.onkeydown = function(event) {
 			if (yz<1-zoom) yz=1-zoom;
 			if (yz>zoom) yz=zoom;
 			draw();
+			break;
+		case 107: // Num+ - прибавка к времени
+		case 69: // E
+			if (realtime) {
+				clearInterval(timerCalc);
+				realtime=0;
+				sjd=jd;
+				draw();
+			}
+			else {
+				jd+=djd[2*ijd+1];
+				sjd=jd;
+				calc();
+			}
+			break;
+		case 109: // Num- - отбавка от времени
+		case 81: // Q
+			if (realtime) {
+				clearInterval(timerCalc);
+				realtime=0;
+				sjd=jd;
+				draw();
+			}
+			else {
+				jd-=djd[2*ijd+1];
+				sjd=jd;
+				calc();
+			}
 			break;
 	}
 }
@@ -1205,6 +1256,41 @@ window.onkeyup = function(event) {
 			modalWin.style.background = sc_colors.sky[vmod];
 			modalWin.style.border = '1px solid '+sc_colors.skyline[vmod];
 			break;
+		case 36: // Home - увеличение шага времени
+			if (realtime) {
+				clearInterval(timerCalc);
+				realtime=0;
+			}
+			else {
+				ijd++;
+				if (ijd>=djd.length/2) ijd=0;
+			}
+			draw();
+			break;
+		case 35: // End - уменьшение шага времени
+			if (realtime) {
+				clearInterval(timerCalc);
+				realtime=0;
+			}
+			else {
+				ijd--;
+				if (ijd<0) ijd=djd.length/2-1;
+			}
+			draw();
+			break;
+		case 32: // Space - текущее время
+			if (!realtime) {
+				realtime=1;
+				calc();
+				timerCalc = setInterval(calc, 30000);
+			}
+			else if (sjd) {
+				clearInterval(timerCalc);
+				realtime=0;
+				jd=sjd;
+				calc();
+			}
+			break;
 	}
 }
 
@@ -1213,6 +1299,7 @@ function draw() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	context.font = "12px Arial";
+	context.save();
 	if (az%1==0) az+=0.0001; // костыль для хромог
 	context.fillStyle=sc_colors.soil[vmod];
 	context.fillRect(0, 0, canvas.width, canvas.height);
@@ -1220,6 +1307,7 @@ function draw() {
 	if (gridlines==1) grid();
 	stars();
 	if (planets==1) drawPlanets();
+	if (!realtime) drawUI();
 }
 
 // Отрисовка созвездий.
@@ -1255,7 +1343,7 @@ function stars() {
 function drawPlanets() {
 	context.fillStyle=sc_colors.names[vmod];
 	for (var i=0; i<planet.length; i++) {
-		if (planet[i].h>-1) {
+		if (planet[i].h>-5) {
 			var x=hA_to_x(planet[i].h, planet[i].A+az);
 			var y=hA_to_y(planet[i].h, planet[i].A+az);
 			var R=canvas.height*dh*zoom/90*planet[i].q;
@@ -1395,18 +1483,18 @@ function cline(x, y, i) {
 
 // Расчет положения светил.
 function calc() {
-	jd=JD();
+	if (realtime) jd=JD();
 	var lstime=LST();
 	calcPlanets(lstime);
 	for (var i=0; i<star.length; i++) {
 		star[i].h=ad_to_h(star[i].a, star[i].d, lstime);
 		star[i].A=ad_to_A(star[i].a, star[i].d, lstime, star[i].h);
-		if (star[i].h>-1 && ref==1) star[i].h+=refr(star[i].h);
+		if (star[i].h>-5 && ref==1) star[i].h+=refr(star[i].h);
 	}
 	for (var i=0; i<planet.length; i++) {
 		planet[i].h=ad_to_h(planet[i].a, planet[i].d, lstime);
 		planet[i].A=ad_to_A(planet[i].a, planet[i].d, lstime, planet[i].h);
-		if (planet[i].h>-1 && ref==1) planet[i].h+=refr(planet[i].h);
+		if (planet[i].h>-5 && ref==1) planet[i].h+=refr(planet[i].h);
 	}
 	draw();
 }
@@ -1576,12 +1664,22 @@ function grid() {
 	}
 }
 
+// Отрисовка интерфейса
+function drawUI() {
+	context.restore();
+	context.textAlign = 'right';
+	context.fillStyle=sc_colors.line[vmod];
+	var date = new Date((jd-2440587.5)*864e5);
+	context.fillText(date.toLocaleString("ru"), canvas.width-20, canvas.height-20);
+	context.fillText(djd[2*ijd], canvas.width-20, canvas.height-40);
+}
+
 // Учет прецессии
 function precession() {
 	var N = (jd-2451545)/365.25/3600;
 	for (var i=0; i<star.length; i++ ) {
-		star[i].a = star[i].a0 + (3.0742+1.33589*Math.sin(15*k*star[i].a0)*Math.tan(k*star[i].d0))*N;
-		star[i].d = star[i].d0 + 20.0383*Math.cos(15*k*star[i].a0)*N;
+		star[i].a = star[i].a0+(3.0742+1.33589*Math.sin(15*k*star[i].a0)*Math.tan(k*star[i].d0))*N;
+		star[i].d = star[i].d0+20.0383*Math.cos(15*k*star[i].a0)*N;
 	}
 }
 
@@ -1678,19 +1776,6 @@ function lb_to_d(l, b) {
 	return Math.asin(sinD)/k
 }
 
-// Цвет звезд.
-function starsColor(color) {
-	switch (color) {
-		case "O": return "#9aafff";
-		case "B": return "#cad7ff";
-		case "A": return "#f8f7ff";
-		case "F": return "#fff4ea";
-		case "G": return "#fff2a1";
-		case "K": return "#ffc46f";
-		case "M": return "#ff6060";
-	}
-}
-
 </script>
 
 <!-- Окно справки -->
@@ -1699,7 +1784,7 @@ function starsColor(color) {
 	←/→ - поворот неба по/против часовой стрелки, <br>
 	↑/↓ - обзор неба по вертикали, <br>
 	WASD - быстрая навигация по сторонам света, <br>
-	Pg Up/Pg Dn - увеличение/уменьшение, <br>
+	Page Up/Page Down - увеличение/уменьшение, <br>
 	C - ввести свои координаты, <br>
 	X - получить координаты из браузера, <br>
 	L - вкл/выкл линии созвездий, <br>
@@ -1709,7 +1794,10 @@ function starsColor(color) {
 	N - переключить отображение названий созвездий, <br>
 	M - переключить отображение названий звезд, <br>
 	R - вкл/выкл учет атмосферной рефракции, <br>
-	V - сменить визуальный режим.
+	V - сменить визуальный режим, <br>
+	Num+/Num- или Q/E - изменение времени, <br>
+	Home/End - изменение шага времени, <br>
+	Space - переключение на реальное время или выбранное.
 </div>
 
 </body>
