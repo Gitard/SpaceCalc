@@ -15,7 +15,7 @@ html, body {
 }
 .modalwin {
 	width: 400px;
-	height: 420px;
+	height: 430px;
 	top: 10%;
 	right: 0;
 	left: 0;
@@ -1291,6 +1291,19 @@ window.onkeyup = function(event) {
 				calc();
 			}
 			break;
+		case 84: // T - ввод произвольного времени
+			var date = new Date((jd-2440587.5)*864e5);
+			var dstr = prompt("Введите произвольное время.", formatDate(date));
+			if (dstr!=null) {
+				if (realtime) {
+					clearInterval(timerCalc);
+					realtime=0;
+				}
+				jd=parseDate(dstr);
+				sjd=jd;
+				calc();
+			}
+			break;
 	}
 }
 
@@ -1670,8 +1683,33 @@ function drawUI() {
 	context.textAlign = 'right';
 	context.fillStyle=sc_colors.line[vmod];
 	var date = new Date((jd-2440587.5)*864e5);
-	context.fillText(date.toLocaleString("ru"), canvas.width-20, canvas.height-20);
+	context.fillText(formatDate(date), canvas.width-20, canvas.height-20);
 	context.fillText(djd[2*ijd], canvas.width-20, canvas.height-40);
+}
+
+// Форматирование даты до строки вида "hh:mm, DD.MM.YYYY".
+function formatDate(date) {
+	var hh = date.getHours();
+	if (hh<10) hh='0'+hh;
+	var mm = date.getMinutes();
+	if (mm<10) mm='0'+mm;
+	var dd = date.getDate();
+	if (dd<10) dd='0'+dd;
+	var mon = date.getMonth()+1;
+	if (mon<10) mon='0'+mon;
+	var yyyy = date.getFullYear();
+	return hh+':'+mm+', '+dd+'.'+mon+'.'+yyyy;
+}
+
+// Разбор строки в дату.
+function parseDate(str) {
+	var arr=str.split(', ');
+	var hm=arr[0].split(':');
+	var dmy=arr[1].split('.');
+	var date = new Date;
+	date.setFullYear(+dmy[2], +dmy[1]-1, +dmy[0]);
+	date.setHours(+hm[0], +hm[1], 0, 0);
+	return 2440587.5+(+date)/864e5;
 }
 
 // Учет прецессии
@@ -1795,7 +1833,8 @@ function lb_to_d(l, b) {
 	M - переключить отображение названий звезд, <br>
 	R - вкл/выкл учет атмосферной рефракции, <br>
 	V - сменить визуальный режим, <br>
-	Num+/Num- или Q/E - изменение времени, <br>
+	T - ввод произвольного времени, <br>
+	Num+/Num- или E/Q - изменение времени, <br>
 	Home/End - изменение шага времени, <br>
 	Space - переключение на реальное время или выбранное.
 </div>
