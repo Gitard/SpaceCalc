@@ -45,7 +45,7 @@ var djd = [
 	'час', 0.04166666666,
 	'звездные сутки', 0.99726956633,
 	'сутки', 1,
-	'синодический месяц', 29.53058812,
+	'лунные сутки', 1.035050101,
 ];
 
 // База цветовых режимов.
@@ -1281,6 +1281,8 @@ window.onkeyup = function(event) {
 		case 32: // Space - текущее время
 			if (!realtime) {
 				realtime=1;
+				jd=JD();
+				precession();
 				calc();
 				timerCalc = setInterval(calc, 30000);
 			}
@@ -1288,12 +1290,13 @@ window.onkeyup = function(event) {
 				clearInterval(timerCalc);
 				realtime=0;
 				jd=sjd;
+				precession();
 				calc();
 			}
 			break;
 		case 84: // T - ввод произвольного времени
 			var date = new Date((jd-2440587.5)*864e5);
-			var dstr = prompt("Введите произвольное время.", formatDate(date));
+			var dstr = prompt("Введите произвольное местное время.", formatDate(date));
 			if (dstr!=null) {
 				if (realtime) {
 					clearInterval(timerCalc);
@@ -1301,6 +1304,7 @@ window.onkeyup = function(event) {
 				}
 				jd=parseDate(dstr);
 				sjd=jd;
+				precession();
 				calc();
 			}
 			break;
@@ -1818,7 +1822,7 @@ function lb_to_d(l, b) {
 
 <!-- Окно справки -->
 <div id="helpWin" class="modalwin">
-	<h2> Справка по управляющим клавишам. </h2><br>
+	<h2> Справка по управляющим клавишам. </h2>
 	←/→ - поворот неба по/против часовой стрелки, <br>
 	↑/↓ - обзор неба по вертикали, <br>
 	WASD - быстрая навигация по сторонам света, <br>
